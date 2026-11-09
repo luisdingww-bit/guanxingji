@@ -398,3 +398,83 @@ a{color:inherit; text-decoration:none}
 .tarot-card:focus-visible{outline:2px solid var(--gold); outline-offset:4px}
 .field input:focus-visible,.field select:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
 .btn-primary:focus-visible,.btn-ghost:focus-visible{outline:2px solid var(--gold-lit); outline-offset:3px}
+.scale-row span{font-size:12.5px; letter-spacing:.04em}
+
+/* --- bold / direct reading mode --- */
+.bold-sec{animation:boldIn .8s var(--ease) both}
+@keyframes boldIn{from{opacity:0; transform:translateY(18px)}to{opacity:1; transform:none}}
+.bold-lead{font-family:var(--serif); font-size:13.5px; line-height:2; color:var(--muted); margin:0 0 26px; letter-spacing:.04em}
+.bold-lead b{color:var(--gold-lit); font-weight:500}
+.bold-note{margin:22px 0 0; font-size:11.5px; line-height:1.9; color:var(--muted-2); border-left:1px solid var(--cinnabar); padding-left:16px}
+
+.longevity{border:1px solid var(--line); background:linear-gradient(160deg,rgba(200,168,107,.075),rgba(255,255,255,.006)); padding:clamp(24px,3.6vw,46px)}
+.lon-top{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:44px; align-items:center; padding-bottom:30px; border-bottom:1px solid var(--line-soft)}
+.lon-label{font-size:10.5px; letter-spacing:.28em; color:var(--gold-dim)}
+.lon-num{font-family:var(--display); font-size:clamp(86px,11vw,148px); line-height:.95; color:var(--gold-lit); text-shadow:0 0 60px rgba(200,168,107,.22)}
+.lon-num span{font-family:var(--serif); font-size:22px; margin-left:10px; color:var(--gold-dim); letter-spacing:.1em}
+.lon-range{font-family:var(--serif); font-size:14px; letter-spacing:.1em; color:var(--muted); margin-top:6px}
+.lon-range b{color:var(--gold-lit); font-size:20px; font-weight:400}
+.lon-side p{font-family:var(--serif); font-size:13px; line-height:2.05; color:var(--muted); margin:0 0 14px; letter-spacing:.04em}
+.lon-side p:last-child{margin-bottom:0}
+.lon-factors{margin-top:26px}
+.lf-row{display:grid; grid-template-columns:110px 70px 1fr; gap:18px; padding:12px 0; border-bottom:1px solid var(--line-soft); font-size:12.5px; line-height:1.8}
+.lf-k{color:var(--gold-lit); font-family:var(--serif); letter-spacing:.08em}
+.lf-v{font-family:var(--display); font-size:15px; color:var(--jade)}
+.lf-d{color:var(--muted)}
+.gate-head{margin:34px 0 16px; font-size:10.5px; letter-spacing:.26em; color:var(--gold-dim)}
+.gate-row{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-soft); border:1px solid var(--line-soft)}
+.gate{background:var(--bg-2); padding:24px 20px}
+.g-age{font-family:var(--display); font-size:27px; color:var(--gold-lit); letter-spacing:.06em}
+.g-t{font-family:var(--serif); font-size:13px; color:var(--gold-dim); margin:2px 0 12px; letter-spacing:.1em}
+.gate p{margin:0; font-family:var(--serif); font-size:12.5px; line-height:2; color:var(--muted)}
+
+.domain-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-soft); border:1px solid var(--line-soft)}
+.domain-card{background:var(--bg-2); padding:28px 24px}
+.dc-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
+.dc-name{font-family:var(--serif); font-size:18px; letter-spacing:.12em; color:var(--gold-lit); display:block}
+.dc-en{display:block; font-family:var(--display); font-size:10px; letter-spacing:.24em; color:var(--muted-2); margin-top:2px}
+.dc-score{font-family:var(--display); font-size:32px; color:var(--gold-lit); line-height:1}
+.dc-bar{height:3px; background:rgba(255,255,255,.07); margin:16px 0 20px; overflow:hidden}
+.dc-fill{display:block; height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold-lit))}
+.dc-body{font-family:var(--serif); font-size:13.5px; line-height:2.1; color:var(--ink); margin:0 0 16px; letter-spacing:.03em}
+.dc-basis{font-size:11px; color:var(--muted-2); margin:0; border-top:1px solid var(--line-soft); padding-top:12px; line-height:1.8}
+
+.detail-list{border-top:1px solid var(--line-soft)}
+.detail{display:grid; grid-template-columns:40px 90px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--line-soft); align-items:start}
+.dt-i{font-family:var(--display); font-size:14px; color:var(--gold-dim); letter-spacing:.1em}
+.dt-tag{font-family:var(--serif); font-size:14px; color:var(--gold-lit); letter-spacing:.1em}
+.dt-text{font-family:var(--serif); font-size:14px; line-height:2; color:var(--ink); margin:0 0 4px; letter-spacing:.03em}
+.dt-by{font-size:11px; color:var(--muted-2); margin:0; letter-spacing:.04em}
+
+.year-list{border-top:1px solid var(--line-soft)}
+.year-row{display:grid; grid-template-columns:180px 1fr; gap:24px; padding:20px 0; border-bottom:1px solid var(--line-soft)}
+.yr-left{display:flex; align-items:baseline; gap:14px}
+.yr-y{font-family:var(--display); font-size:25px; color:var(--gold-lit)}
+.yr-gz{font-family:var(--serif); font-size:14px; color:var(--muted)}
+.yr-score{margin-left:auto; font-family:var(--display); font-size:21px; color:var(--jade)}
+.yr-tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+.tag{font-size:10.5px; letter-spacing:.1em; border:1px solid var(--line-soft); padding:2px 9px; color:var(--muted)}
+.tag.good{color:var(--gold-lit); border-color:var(--line)}
+.tag.care{color:var(--cinnabar); border-color:rgba(181,86,63,.4)}
+.yr-word{font-family:var(--serif); font-size:13.5px; color:var(--ink); margin:0 0 6px; line-height:1.9; letter-spacing:.03em}
+.yr-do{font-size:11.5px; color:var(--muted-2); margin:0; letter-spacing:.04em}
+
+@media (max-width:1000px){
+  .domain-grid{grid-template-columns:repeat(2,1fr)}
+  .lon-top{grid-template-columns:1fr; gap:24px}
+}
+@media (max-width:720px){
+  .domain-grid,.gate-row{grid-template-columns:1fr}
+  .year-row{grid-template-columns:1fr; gap:10px}
+  .detail{grid-template-columns:30px 1fr; gap:8px 12px}
+  .dt-tag{grid-column:2}
+  .detail > div{grid-column:2}
+  .lf-row{grid-template-columns:86px 52px 1fr; gap:10px; font-size:11.5px}
+  .lon-num{font-size:88px}
+  .yr-score{margin-left:0}
+}
+@media print{
+  .reading .lon-num,.reading .dc-name,.reading .dc-score,.reading .g-age,.reading .yr-y,
+  .reading .dt-tag,.reading .lf-k{color:#8a6b2f !important}
+  .reading .bold-sec{opacity:1 !important; transform:none !important; animation:none !important}
+}
