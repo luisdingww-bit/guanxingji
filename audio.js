@@ -48,13 +48,15 @@ function paintVolume() {
   var muted = audio.muted || audio.volume === 0;
   icoVol.style.display  = muted ? 'none' : 'block';
   icoMute.style.display = muted ? 'block' : 'none';
-  muteBtn.setAttribute('aria-label', muted ? '取消静音' : '静音');
+  var J = window.GXJI18N;
+  muteBtn.setAttribute('aria-label', J ? J.get(muted ? 'bgm.unmute' : 'bgm.mute') : (muted ? '取消静音' : '静音'));
 }
 function paintPlaying(on) {
   bar.classList.toggle('is-playing', on);
   icoPlay.style.display  = on ? 'none' : 'block';
   icoPause.style.display = on ? 'block' : 'none';
-  toggle.setAttribute('aria-label', on ? '暂停背景音' : '播放背景音');
+  var I = window.GXJI18N;
+  toggle.setAttribute('aria-label', I ? I.get(on ? 'bgm.pause' : 'bgm.play') : (on ? '暂停背景音' : '播放背景音'));
   if (on) hint.hidden = true;
 }
 function attemptPlay() {
@@ -78,7 +80,7 @@ audio.addEventListener('pause', function () { paintPlaying(false); });
 audio.addEventListener('volumechange', paintVolume);
 audio.addEventListener('loadedmetadata', function () { durEl.textContent = mmss(audio.duration); });
 audio.addEventListener('error', function () {
-  hint.textContent = '音频加载失败，请刷新页面重试';
+  hint.textContent = window.GXJI18N ? window.GXJI18N.get('bgm.error') : '音频加载失败，请刷新页面重试';
   hint.hidden = false;
 });
 

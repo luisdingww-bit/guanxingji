@@ -10,6 +10,7 @@
 window.GXJBold = {
   enhance: function (body, c, D) {
     var scaleEl = document.querySelector('input[name="scale"]:checked');
+    if (window.GXJI18N && window.GXJI18N.lang === 'en') return;
     var scale = scaleEl ? scaleEl.value : 'bold';
     if (scale !== 'bold') return;
 
@@ -204,7 +205,7 @@ function compute(c, D) {
     '三方会 ' + esc(c.oppStars.slice(0, 2).join('、') || '无正曜') + '，' +
     (c.oppStars.length ? '说明帮你的人有，但都得你自己先动，不会自动上门。' : '说明盘里缺少天然兜底的结构，出了事得自己收。') +
     '<b>直断：35–45 这十年是把资源换成位置的关键窗口</b>；之前所有试错都在给这段铺路。这段求稳反而漏，该争的要争。';
-  texts.ziweiBasis = '命宫由生月宫逆数生时、身宫顺数生时；宫干用五虎遁，纳音定五行局；紫微星系逆布、天府星系顺布取相对格局。本站为意象简盘，星位不做专业排盘校对。';
+  texts.ziweiBasis = '命宫以农历月自寅顺数、生时逆数而定，身宫顺数；宫干用五虎遁，纳音定五行局；紫微依「局数除日数，商数宫前走」口诀定位，天府依寅申轴对称，十四主星依紫微系逆布、天府系顺布。';
 
   texts.tarot =
     '过去「' + esc(T[c.cards[0].idx].n) + '」、现在「' + esc(present.n) + '」' + (c.cards[1].rev ? '逆位' : '正位') +

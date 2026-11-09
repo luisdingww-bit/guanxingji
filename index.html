@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="观星纪 · 八字、紫微斗数与塔罗三术合参：寿元推演、命运直断、生活细节与流年运势。术数文化演绎，非医学或事实预测。">
-<title>观星纪 · THE ASTRAL LEDGER</title>
+<meta name="description" content="观星纪 EPHEMERIS (Guanxingji) — Ba Zi, Zi Wei Dou Shu and Tarot. A bilingual cultural-algorithmic reading with cited calendrical sources.">
+<title>观星纪 EPHEMERIS · 八字 / 紫微 / 塔罗</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,19 +14,23 @@
 <div class="grain" aria-hidden="true"></div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#top" aria-label="观星纪 首页">
+  <a class="brand" href="#top" aria-label="EPHEMERIS · Guanxingji">
     <span class="brand-mark" aria-hidden="true">
       <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="7" stroke="currentColor" stroke-width=".7" opacity=".6"/><path d="M16 1v6M16 25v6M1 16h6M25 16h6" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="1.6" fill="currentColor"/></svg>
     </span>
-    <span class="brand-text">观星纪</span>
-    <span class="brand-en">ASTRAL LEDGER</span>
+    <span class="brand-text" data-i18n="brand.zh">观星纪</span>
+    <span class="brand-en" data-i18n="brand.roman">GUANXINGJI</span>
   </a>
   <nav class="nav-links" aria-label="主导航">
-    <a href="#method">三术</a>
-    <a href="#cast">起盘</a>
-    <a href="#boundary">边界</a>
+    <a href="#method" data-i18n="nav.method">三术</a>
+    <a href="#cast" data-i18n="nav.cast">起盘</a>
+    <a href="#sources" data-i18n="nav.sources">文献</a>
+    <a href="#boundary" data-i18n="nav.boundary">边界</a>
   </nav>
-  <a href="#cast" class="nav-cta">起 一 盘 <span aria-hidden="true">↗</span></a>
+  <div class="nav-actions">
+    <button type="button" class="lang-btn" id="lang-toggle" title="Switch to English">EN</button>
+    <a href="#cast" class="nav-cta"><span data-i18n="nav.cta">起 一 盘</span> <span aria-hidden="true">↗</span></a>
+  </div>
 </header>
 
 <main id="top">
@@ -34,16 +38,16 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow reveal">卷 一 · 直 断 <span class="eyebrow-line"></span> EST. MMXXVI</p>
+      <p class="eyebrow reveal"><span data-i18n="hero.eyebrow">卷 一 · 直 断</span><span class="eyebrow-line"></span> EST. MMXXVI</p>
       <h1 class="hero-title">
-        <span class="line reveal">命，<em>亦可推</em></span>
-        <span class="line reveal">势，<em>可以断</em></span>
+        <span class="line reveal"><span data-i18n="hero.l1a">命，</span><em data-i18n="hero.l1b">亦可推</em></span>
+        <span class="line reveal"><span data-i18n="hero.l2a">势，</span><em data-i18n="hero.l2b">可以断</em></span>
       </h1>
       <div class="hero-bottom">
-        <p class="hero-desc reveal">以四柱定其骨，以星垣布其象，以三牌取其喻。<br>三术合参，直断寿元、运势与生活细处，不绕弯。</p>
+        <p class="hero-desc reveal" data-i18n-html="hero.desc">以四柱定其骨，以星垣布其象，以三牌取其喻。<br>三术合参，直断寿元、运势与生活细处，不绕弯。</p>
         <div class="hero-side reveal">
-          <span class="hero-index">01 / 04</span>
-          <a class="scroll-cue" href="#method">向下阅 <span aria-hidden="true">↓</span></a>
+          <span class="hero-index" data-i18n="hero.index">01 / 05</span>
+          <a class="scroll-cue" href="#method"><span data-i18n="hero.scroll">向下阅</span> <span aria-hidden="true">↓</span></a>
         </div>
       </div>
     </div>
@@ -64,47 +68,47 @@
   <section class="section method" id="method">
     <div class="section-head reveal">
       <span class="section-no">02</span>
-      <h2>三术合参</h2>
-      <p class="section-sub">THREE LENSES, ONE READING</p>
+      <h2 data-i18n="sec.method">三术合参</h2>
+      <p class="section-sub" data-i18n="sec.method.en">THREE LENSES, ONE READING</p>
     </div>
-    <p class="method-lead reveal">同一段生辰，换三种目光去看。<br>东方问「气」，星垣问「位」，塔罗问「心」——合起来，给一个不绕弯的判断。</p>
+    <p class="method-lead reveal" data-i18n-html="method.lead">同一段生辰，换三种目光去看。<br>东方问「气」，星垣问「位」，塔罗问「心」——合起来，给一个不绕弯的判断。</p>
 
     <div class="method-grid">
       <article class="method-card reveal">
         <div class="method-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" fill="none"><rect x="12" y="12" width="40" height="40" rx="2" stroke="currentColor"/><path d="M12 24h40M12 40h40M24 12v40M40 12v40" stroke="currentColor" opacity=".35"/><circle cx="32" cy="32" r="5" stroke="currentColor"/><path d="M32 27v10M27 32h10" stroke="currentColor"/></svg>
         </div>
-        <span class="method-num">壹 · 01</span>
-        <h3>四柱八字</h3>
-        <p class="method-en">FOUR PILLARS</p>
-        <p>以生辰推年月日时四柱，看五行偏全、日主强弱、十神透藏。直接说清你的底气、短板与发力的时间差。</p>
-        <ul class="method-tags"><li>节气定月</li><li>五虎遁</li><li>五行占比</li></ul>
+        <span class="method-num" data-i18n="m1.num">壹 · 01</span>
+        <h3 data-i18n="m1.title">四柱八字</h3>
+        <p class="method-en" data-i18n="m1.en">BAZI</p>
+        <p data-i18n="m1.body">以生辰推年月日时四柱，看五行偏全、日主强弱、十神透藏。直接说清你的底气、短板与发力的时间差。</p>
+        <ul class="method-tags" data-i18n-list="m1.tags"><li>节气定月</li><li>五虎遁</li><li>五行占比</li></ul>
       </article>
       <article class="method-card reveal">
         <div class="method-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="23" stroke="currentColor"/><circle cx="32" cy="32" r="15" stroke="currentColor" opacity=".45"/><path d="M32 9v46M9 32h46" stroke="currentColor" opacity=".3"/><circle cx="32" cy="9" r="2.6" fill="currentColor"/><circle cx="47" cy="47" r="2" fill="currentColor" opacity=".6"/><circle cx="17" cy="47" r="2" fill="currentColor" opacity=".6"/></svg>
         </div>
-        <span class="method-num">贰 · 02</span>
-        <h3>紫微星垣</h3>
-        <p class="method-en">ZI WEI DOU SHU</p>
-        <p>定命身二宫，布十四主星于十二垣。命宫主星与三方会照，直接对应性格、事业、财路与关系模式。</p>
-        <ul class="method-tags"><li>命身二宫</li><li>三方四正</li><li>意象简盘</li></ul>
+        <span class="method-num" data-i18n="m2.num">贰 · 02</span>
+        <h3 data-i18n="m2.title">紫微星垣</h3>
+        <p class="method-en" data-i18n="m2.en">ZI WEI DOU SHU</p>
+        <p data-i18n="m2.body">定命身二宫，布十四主星于十二垣。命宫主星与三方会照，直接对应性格、事业、财路与关系模式。</p>
+        <ul class="method-tags" data-i18n-list="m2.tags"><li>命身二宫</li><li>三方四正</li><li>标准主星盘</li></ul>
       </article>
       <article class="method-card reveal">
         <div class="method-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" fill="none"><rect x="18" y="10" width="28" height="44" rx="3" stroke="currentColor"/><rect x="12" y="16" width="28" height="44" rx="3" stroke="currentColor" opacity=".45" transform="rotate(-9 12 16)"/><path d="M32 20l4 8 8 1-6 6 2 9-8-4-8 4 2-9-6-6 8-1z" stroke="currentColor" stroke-width=".8"/></svg>
         </div>
-        <span class="method-num">叁 · 03</span>
-        <h3>塔罗三牌</h3>
-        <p class="method-en">TAROT SPREAD</p>
-        <p>以生辰为种子，抽过去、现在、将来三牌。不谈玄虚，直指你现在卡在哪、哪件事早该收尾。</p>
-        <ul class="method-tags"><li>大阿卡纳</li><li>正逆位</li><li>三牌阵列</li></ul>
+        <span class="method-num" data-i18n="m3.num">叁 · 03</span>
+        <h3 data-i18n="m3.title">塔罗三牌</h3>
+        <p class="method-en" data-i18n="m3.en">TAROT SPREAD</p>
+        <p data-i18n="m3.body">以生辰为种子，抽过去、现在、将来三牌。不谈玄虚，直指你现在卡在哪、哪件事早该收尾。</p>
+        <ul class="method-tags" data-i18n-list="m3.tags"><li>大阿卡纳</li><li>正逆位</li><li>三牌阵列</li></ul>
       </article>
     </div>
 
     <div class="disclaimer-inline reveal">
       <span class="disc-mark" aria-hidden="true">※</span>
-      <p><strong>关于「寿元」</strong> — 本站提供两种断语尺度：<strong>大胆直断</strong>给出寿元区间、关口岁段与逐年运势，<strong>含蓄意象</strong>只观节律、不落数字。两者均为术数文化演绎与算法推演，不是医学结论，也不是事实预测。</p>
+      <p data-i18n-html="disc.longevity"><strong>关于「寿元」</strong> — 本站提供两种断语尺度。</p>
     </div>
   </section>
 
@@ -112,53 +116,47 @@
   <section class="section cast" id="cast">
     <div class="section-head reveal">
       <span class="section-no">03</span>
-      <h2>起 盘</h2>
-      <p class="section-sub">CAST YOUR CHART</p>
+      <h2 data-i18n="sec.cast">起 盘</h2>
+      <p class="section-sub" data-i18n="sec.cast.en">CAST YOUR CHART</p>
     </div>
 
     <form class="cast-form reveal" id="cast-form" novalidate>
       <div class="form-grid">
         <div class="field">
-          <label for="f-name">称呼 <span class="opt">选填</span></label>
-          <input id="f-name" name="name" type="text" maxlength="16" placeholder="如何称呼你" autocomplete="off">
+          <label for="f-name"><span data-i18n="f.name">称呼</span> <span class="opt" data-i18n="f.name.opt">选填</span></label>
+          <input id="f-name" name="name" type="text" maxlength="16" data-i18n-ph="f.name.ph" placeholder="如何称呼你" autocomplete="off">
         </div>
         <div class="field">
-          <label for="f-date">公历生辰 <span class="req">必填</span></label>
+          <label for="f-date"><span data-i18n="f.date">公历生辰</span> <span class="req" data-i18n="f.date.req">必填</span></label>
           <input id="f-date" name="date" type="date" min="1900-01-01" max="2026-11-09" required>
         </div>
         <div class="field">
-          <label for="f-hour">出生时辰 <span class="req">必填</span></label>
+          <label for="f-hour"><span data-i18n="f.hour">出生时辰</span> <span class="req" data-i18n="f.date.req">必填</span></label>
           <select id="f-hour" name="hour" required>
-            <option value="0">子时 · 23:00–01:00</option>
-            <option value="1">丑时 · 01:00–03:00</option>
-            <option value="2">寅时 · 03:00–05:00</option>
-            <option value="3">卯时 · 05:00–07:00</option>
-            <option value="4">辰时 · 07:00–09:00</option>
-            <option value="5">巳时 · 09:00–11:00</option>
-            <option value="6" selected>午时 · 11:00–13:00</option>
-            <option value="7">未时 · 13:00–15:00</option>
-            <option value="8">申时 · 15:00–17:00</option>
-            <option value="9">酉时 · 17:00–19:00</option>
-            <option value="10">戌时 · 19:00–21:00</option>
-            <option value="11">亥时 · 21:00–23:00</option>
+            <option value="0">子时 · 23:00–01:00</option><option value="1">丑时 · 01:00–03:00</option>
+            <option value="2">寅时 · 03:00–05:00</option><option value="3">卯时 · 05:00–07:00</option>
+            <option value="4">辰时 · 07:00–09:00</option><option value="5">巳时 · 09:00–11:00</option>
+            <option value="6" selected>午时 · 11:00–13:00</option><option value="7">未时 · 13:00–15:00</option>
+            <option value="8">申时 · 15:00–17:00</option><option value="9">酉时 · 17:00–19:00</option>
+            <option value="10">戌时 · 19:00–21:00</option><option value="11">亥时 · 21:00–23:00</option>
           </select>
         </div>
         <div class="field">
-          <label>性别 <span class="opt">用于称谓</span></label>
-          <div class="radio-row" role="radiogroup" aria-label="性别">
-            <label class="radio"><input type="radio" name="gender" value="qian" checked><span>乾造 · 男</span></label>
-            <label class="radio"><input type="radio" name="gender" value="kun"><span>坤造 · 女</span></label>
+          <label><span data-i18n="f.gender">性别</span> <span class="opt" data-i18n="f.gender.opt">用于称谓</span></label>
+          <div class="radio-row" role="radiogroup" aria-label="Sex">
+            <label class="radio"><input type="radio" name="gender" value="qian" checked><span data-i18n="f.gender.q">乾造 · 男</span></label>
+            <label class="radio"><input type="radio" name="gender" value="kun"><span data-i18n="f.gender.k">坤造 · 女</span></label>
           </div>
         </div>
         <div class="field field-wide">
-          <label for="f-place">出生地 <span class="opt">选填 · 不参与推算</span></label>
-          <input id="f-place" name="place" type="text" maxlength="24" placeholder="例如：厦门 / 中国香港" autocomplete="off">
+          <label for="f-place"><span data-i18n="f.place">出生地</span> <span class="opt" data-i18n="f.place.opt">选填 · 不参与推算</span></label>
+          <input id="f-place" name="place" type="text" maxlength="24" data-i18n-ph="f.place.ph" placeholder="例如：厦门 / 中国香港" autocomplete="off">
         </div>
         <div class="field field-wide">
-          <label>断语尺度 <span class="req">默认大胆</span></label>
-          <div class="radio-row scale-row" role="radiogroup" aria-label="断语尺度">
-            <label class="radio"><input type="radio" name="scale" value="bold" checked><span>大胆直断 · 给寿元、运势与生活细节</span></label>
-            <label class="radio"><input type="radio" name="scale" value="subtle"><span>含蓄意象 · 只观节律，不落数字</span></label>
+          <label><span data-i18n="f.scale">断语尺度</span> <span class="req" data-i18n="f.scale.req">默认大胆</span></label>
+          <div class="radio-row scale-row" role="radiogroup" aria-label="Reading register">
+            <label class="radio"><input type="radio" name="scale" value="bold" checked><span data-i18n="f.scale.bold">大胆直断 · 给寿元、运势与生活细节</span></label>
+            <label class="radio"><input type="radio" name="scale" value="subtle"><span data-i18n="f.scale.subtle">含蓄意象 · 只观节律，不落数字</span></label>
           </div>
         </div>
       </div>
@@ -166,15 +164,62 @@
       <label class="consent">
         <input type="checkbox" id="f-consent" required>
         <span class="consent-box" aria-hidden="true"></span>
-        <span>我已阅读并理解<a href="#boundary" target="_self">边界声明</a>：本站内容为术数文化演绎与算法生成的象征性推演，不构成医学、法律、投资或人生决策建议；相关判断与责任由我自行承担。</span>
+        <span><span data-i18n="f.consent">我已阅读并理解</span><a href="#boundary" data-i18n="f.consent.link">边界声明</a><span data-i18n="f.consent.tail">：本站内容为术数文化演绎与算法生成的象征性推演，不构成医学、法律、投资或人生决策建议；相关判断与责任由我自行承担。</span></span>
       </label>
 
       <div class="form-actions">
-        <button type="submit" class="btn-primary">起 盘 <span aria-hidden="true">→</span></button>
-        <p class="form-note">所有推算在你的浏览器本地完成，不上传、不留存、不读取任何设备数据。</p>
+        <button type="submit" class="btn-primary"><span data-i18n="f.submit">起 盘</span> <span aria-hidden="true">→</span></button>
+        <p class="form-note" data-i18n="f.note">所有推算在你的浏览器本地完成，不上传、不留存、不读取任何设备数据。</p>
       </div>
       <p class="form-error" id="form-error" role="alert" hidden></p>
     </form>
+  </section>
+
+  <!-- SOURCES -->
+  <section class="section sources" id="sources">
+    <div class="section-head reveal">
+      <span class="section-no">04</span>
+      <h2 data-i18n="sec.sources">文献与算法</h2>
+      <p class="section-sub" data-i18n="sec.sources.en">SOURCES & METHOD</p>
+    </div>
+    <p class="sources-lead reveal" data-i18n-html="sources.lead">本版排盘不再使用近似月份或随机星位。</p>
+    <div class="source-list reveal">
+      <div class="source-item"><span class="src-no">01</span><div class="src-body">
+        <h4>农历数据表与节气公式 / Lunar Table &amp; Solar-Term Formula</h4>
+        <p>1900–2100 lunarInfo 数据表与「寿星公式」节气常数，用于公历转农历与逐年月界判定。</p>
+        <a href="https://blog.jjonline.cn/linux/173.html" target="_blank" rel="noopener noreferrer">blog.jjonline.cn/linux/173.html ↗</a></div></div>
+      <div class="source-item"><span class="src-no">02</span><div class="src-body">
+        <h4>完整 lunarInfo 数据表 / Complete 1900–2100 Data</h4>
+        <p>逐位十六进制编码的闰月与大小月表，用于交叉核对农历换算。</p>
+        <a href="https://www.github.com/ZenRonphy/SolarToLunarCalendar/blob/master/LunisolarCalendar.cs" target="_blank" rel="noopener noreferrer">github.com/ZenRonphy/SolarToLunarCalendar ↗</a></div></div>
+      <div class="source-item"><span class="src-no">03</span><div class="src-body">
+        <h4>四柱三套口径 / Three Bazi Conventions</h4>
+        <p>立春换年、节气换月、五虎遁、六十甲子纳音与藏干口径的区分。</p>
+        <a href="https://ccziwei.com/mingli/bazi/articles/gan-zhi-wu-xing-dui-zhao-biao-nian-yue-ri-shi" target="_blank" rel="noopener noreferrer">ccziwei.com · 干支五行对照表 ↗</a></div></div>
+      <div class="source-item"><span class="src-no">04</span><div class="src-body">
+        <h4>藏干、十神与旺衰 / Hidden Stems, Ten Gods, Strength</h4>
+        <p>十二地支藏干表、五鼠遁、十神定义，以及得令 / 得地 / 得势的旺衰判据。</p>
+        <a href="https://www.fyqyw.com/view/283700" target="_blank" rel="noopener noreferrer">fyqyw.com · 八字基础 天干地支五行入门 ↗</a></div></div>
+      <div class="source-item"><span class="src-no">05</span><div class="src-body">
+        <h4>节气交界与真太阳时 / Boundary Dates &amp; Apparent Solar Time</h4>
+        <p>说明为何交节当天不能凭记忆估算，以及经度校正的必要性（本站未实施）。</p>
+        <a href="https://www.cksct.com/paipan/bazi/707901.html" target="_blank" rel="noopener noreferrer">cksct.com · 排盘常见错误 ↗</a></div></div>
+      <div class="source-item"><span class="src-no">06</span><div class="src-body">
+        <h4>紫微安星诀 / Zi Wei An Xing Jue</h4>
+        <p>命身宫起法、十二宫逆排、五行局、紫微星定位、天府对称与十四主星顺逆布列。</p>
+        <a href="https://ziweimingli.com/articles/zi-wei-dou-shu-an-xing-jue-257" target="_blank" rel="noopener noreferrer">ziweimingli.com · 紫微斗数安星诀 ↗</a></div></div>
+      <div class="source-item"><span class="src-no">07</span><div class="src-body">
+        <h4>起紫微星诀例题 / Worked Placement Examples</h4>
+        <p>「六五四三二，酉午亥辰丑；局数除日数，商数宫前走」及三条例题，用于校验本站算法。</p>
+        <a href="https://m.ziweifu.com/ziweizatan/1887.html" target="_blank" rel="noopener noreferrer">ziweifu.com · 紫微斗数之安星诀 ↗</a> ·
+        <a href="http://www.fushantang.com/1012/c/1012c/j3084.html" target="_blank" rel="noopener noreferrer">fushantang.com · 起例歌诀 ↗</a></div></div>
+      <div class="source-item"><span class="src-no">08</span><div class="src-body">
+        <h4>英文术语依据 / English Terminology</h4>
+        <p>Four Pillars of Destiny、Heavenly Stems、Earthly Branches、Five Phases、Ten Gods、Day Master、Sexagenary Cycle。</p>
+        <a href="https://en.wikipedia.org/wiki/Four_Pillars_of_Destiny" target="_blank" rel="noopener noreferrer">Wikipedia · Four Pillars of Destiny ↗</a> ·
+        <a href="https://en.wikipedia.org/wiki/Sexagenary_cycle" target="_blank" rel="noopener noreferrer">Sexagenary cycle ↗</a></div></div>
+    </div>
+    <div class="sources-limits reveal" data-i18n-html="sources.limits">仍保留的边界。</div>
   </section>
 
   <!-- READING -->
@@ -185,22 +230,22 @@
   <!-- BOUNDARY -->
   <section class="section boundary" id="boundary">
     <div class="section-head reveal">
-      <span class="section-no">04</span>
-      <h2>边 界</h2>
-      <p class="section-sub">THE BOUNDARY</p>
+      <span class="section-no">05</span>
+      <h2 data-i18n="sec.boundary">边 界</h2>
+      <p class="section-sub" data-i18n="sec.boundary.en">THE BOUNDARY</p>
     </div>
     <div class="boundary-grid">
       <div class="boundary-main reveal">
-        <p class="boundary-quote">「数可言其势，不可代其择。」</p>
-        <p>命理是一套延续千年的叙事语言。本站默认把断语尺度调到最大：给寿元区间、给六维直断、给生活细节、给逐年运势，措辞不再绕弯；也可在起盘时切回含蓄意象，只观节律、不落数字。</p>
-        <p>但有两条得说清楚：其一，所有数字都由算法与象意加权生成，不是任何形式的医学结论或事实预测；其二，环境、医疗与选择对人生的影响，远大于一张盘。把它当作一面能照见习惯的镜子，比当作判决书有用得多。</p>
+        <p class="boundary-quote" data-i18n="bnd.quote">「数可言其势，不可代其择。」</p>
+        <p data-i18n="bnd.p1">命理是一套延续千年的叙事语言。</p>
+        <p data-i18n="bnd.p2">但有两条得说清楚。</p>
       </div>
       <div class="boundary-list reveal">
-        <div class="b-item"><span>01</span><p>寿元区间由五行停匀、日主气势、命垣星曜、塔罗本命加权合成，是象意数字，不是生理预测。</p></div>
-        <div class="b-item"><span>02</span><p>「关口岁段」取元气曲线低谷与传统关口之说，只作转折与放慢的提醒，不指具体事件。</p></div>
-        <div class="b-item"><span>03</span><p>「生活细节」全部由盘面象意推演，不读取设备、位置、浏览记录或任何真实数据。</p></div>
-        <div class="b-item"><span>04</span><p>星盘为意象简盘，节气用近似日期表，均非专业排盘，不用于术数研习或相互校对。</p></div>
-        <div class="b-item"><span>05</span><p>不上传、不存储、不共享任何填写信息；内容的使用与判断责任由使用者自行承担。</p></div>
+        <div class="b-item"><span>01</span><p data-i18n="bnd.i1">寿元区间由五行停匀、日主气势、命垣星曜、塔罗本命加权合成。</p></div>
+        <div class="b-item"><span>02</span><p data-i18n="bnd.i2">「关口岁段」取元气曲线低谷与传统关口之说。</p></div>
+        <div class="b-item"><span>03</span><p data-i18n="bnd.i3">「生活细节」全部由盘面象意推演。</p></div>
+        <div class="b-item"><span>04</span><p data-i18n="bnd.i4">星盘为标准十四主星盘，节气按公式推算。</p></div>
+        <div class="b-item"><span>05</span><p data-i18n="bnd.i5">不上传、不存储、不共享任何填写信息。</p></div>
       </div>
     </div>
   </section>
@@ -208,37 +253,23 @@
 
 <footer class="footer">
   <div class="footer-inner">
-    <span>观星纪 · THE ASTRAL LEDGER</span>
-    <span>术数文化演绎 · 非医学或事实预测</span>
-    <span>MMXXVI</span>
+    <span data-i18n="footer.1">观星纪 · EPHEMERIS · GUANXINGJI</span>
+    <span data-i18n="footer.2">术数文化演绎 · 非医学或事实预测</span>
+    <span data-i18n="footer.3">MMXXVI</span>
   </div>
 </footer>
-
-<!-- CAST RITUAL OVERLAY -->
-<div class="ritual" id="ritual" hidden aria-live="polite">
-  <div class="ritual-inner">
-    <svg class="ritual-ring" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-      <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width=".6" opacity=".3"/>
-      <circle cx="100" cy="100" r="66" stroke="currentColor" stroke-width=".6" opacity=".5"/>
-      <circle cx="100" cy="100" r="44" stroke="currentColor" stroke-width=".6" opacity=".3"/>
-      <circle class="ritual-spin" cx="100" cy="100" r="88" stroke="currentColor" stroke-width="1.4" stroke-dasharray="40 510" stroke-linecap="round"/>
-    </svg>
-    <p class="ritual-step" id="ritual-step">推 四 柱</p>
-    <p class="ritual-sub" id="ritual-sub">以节气定月，以日辰起时</p>
-  </div>
-</div>
 
 <audio id="bgm" loop preload="auto" src="bgm.mp3"></audio>
 
 <div class="bgm-bar" id="bgm-bar" role="group" aria-label="背景音控制">
-  <div class="bgm-hint" id="bgm-hint" hidden>点一下页面，开启背景音</div>
+  <div class="bgm-hint" id="bgm-hint" data-i18n="bgm.hint" hidden>点一下页面，开启背景音</div>
   <button class="bgm-btn bgm-toggle" id="bgm-toggle" type="button" aria-label="播放背景音">
     <svg id="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
     <svg id="ico-pause" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5h3v14H7zM14 5h3v14h-3z" fill="currentColor"/></svg>
   </button>
   <div class="bgm-meta">
-    <span class="bgm-title">星 律 · 背景音</span>
-    <span class="bgm-sub"><span class="bgm-loop">LOOP</span><span id="bgm-dur">--:--</span></span>
+    <span class="bgm-title" data-i18n="bgm.title">星 律 · 背景音</span>
+    <span class="bgm-sub"><span class="bgm-loop" data-i18n="bgm.loop">LOOP</span><span id="bgm-dur">--:--</span></span>
   </div>
   <button class="bgm-btn bgm-mute" id="bgm-mute" type="button" aria-label="静音">
     <svg id="ico-vol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 010 7M18.5 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
@@ -248,8 +279,24 @@
   <span class="bgm-val" id="bgm-val">45%</span>
 </div>
 
+<div class="ritual" id="ritual" hidden aria-live="polite">
+  <div class="ritual-inner">
+    <svg class="ritual-ring" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+      <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width=".6" opacity=".3"/>
+      <circle cx="100" cy="100" r="66" stroke="currentColor" stroke-width=".6" opacity=".5"/>
+      <circle cx="100" cy="100" r="44" stroke="currentColor" stroke-width=".6" opacity=".3"/>
+      <circle class="ritual-spin" cx="100" cy="100" r="88" stroke="currentColor" stroke-width="1.4" stroke-dasharray="40 510" stroke-linecap="round"/>
+    </svg>
+    <p class="ritual-step" id="ritual-step" data-i18n="ritual.1">推 四 柱</p>
+    <p class="ritual-sub" id="ritual-sub" data-i18n="ritual.1s">以节气定月，以日辰起时</p>
+  </div>
+</div>
+
+<script src="core.js"></script>
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 <script src="bold.js"></script>
+<script src="en.js"></script>
 <script src="audio.js"></script>
 </body>
 </html>

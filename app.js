@@ -219,29 +219,31 @@ function pick(arr, r) { return arr[Math.floor(r() * arr.length)]; }
 function buildChart(input) {
   const y = input.y, m = input.m, d = input.d, t = input.t;
 
-  /* --- solar term / month pillar --- */
-  let jie = null;
-  for (const j of JIE) if (m > j.m || (m === j.m && d >= j.d)) jie = j;
-  if (!jie) jie = { m:12, d:7, order:11, zhi:0, name:'大雪' }; // early Jan belongs to previous Zi month
-  const monthOrder = jie.order;
+  /* --- calendrical core: computed solar terms + lunar conversion --- */
+  const C = window.GXJCore;
+  const lunar = C.solarToLunar(y, m, d) || { year:y, month:1, day:d, isLeap:false };
+  const jieInfo = C.jieForDate(y, m, d);
+  const monthOrder = jieInfo.order;
+  const jie = { name:jieInfo.zh, en:jieInfo.en, day:jieInfo.day, order:monthOrder, zhi:jieInfo.zhi };
 
-  /* --- year pillar (Li Chun boundary) --- */
-  const beforeLiChun = (m < 2) || (m === 2 && d < 4);
+  /* --- year pillar: Start of Spring boundary computed for this year --- */
+  const liChun = C.termDay(y, 2);
+  const beforeLiChun = (m < 2) || (m === 2 && d < liChun);
   const chartYear = beforeLiChun ? y - 1 : y;
   const yearIdx = ((chartYear - 4) % 60 + 60) % 60;
   const yearGan = yearIdx % 10, yearZhi = yearIdx % 12;
 
-  /* --- month pillar (Five Tigers) --- */
-  const yinGan = ((yearGan % 5) * 2 + 2) % 10;
+  /* --- month pillar: sectional term + Five Tigers rule --- */
+  const yinGan = C.yinGanOf(yearGan);
   const monthGan = (yinGan + monthOrder - 1) % 10;
-  const monthZhi = jie.zhi;
+  const monthZhi = jieInfo.zhi;
 
-  /* --- day pillar (Julian day number) --- */
-  const dayIdx = ((jdn(y, m, d) + 49) % 60 + 60) % 60;
+  /* --- day pillar: Julian day number --- */
+  const dayIdx = C.dayPillarIndex(y, m, d);
   const dayGan = dayIdx % 10, dayZhi = dayIdx % 12;
 
-  /* --- hour pillar (Five Rats) --- */
-  const ziGan = (dayGan % 5) * 2;
+  /* --- hour pillar: Five Rats rule --- */
+  const ziGan = C.ziGanOf(dayGan);
   const hourGan = (ziGan + t) % 10, hourZhi = t;
 
   const pillars = [
@@ -283,20 +285,20 @@ function buildChart(input) {
   strength = clamp(Math.round(strength), 12, 92);
   const strengthWord = strength >= 63 ? '偏旺' : strength <= 40 ? '偏弱' : '中和';
 
-  /* --- Zi Wei: ming / shen palaces, palace stems, five-element bureau --- */
-  const mingZhi = ((monthOrder + 1) - t + 12) % 12;
-  const shenZhi = ((monthOrder + 1) + t) % 12;
+  /* --- Zi Wei: Life / Body palaces from LUNAR month and birth hour --- */
+  const mingZhi = C.mingZhiOf(lunar.month, t);
+  const shenZhi = C.shenZhiOf(lunar.month, t);
   const palaceGan = function (z) { return (yinGan + ((z - 2 + 12) % 12)) % 10; };
   const mingGan = palaceGan(mingZhi);
   const mingNayin = nayinOf(gzIndex(mingGan, mingZhi));
   const juName = { '水':'水二局', '木':'木三局', '金':'金四局', '土':'土五局', '火':'火六局' }[mingNayin.slice(-1)] || '土五局';
   const ju = { '水':2, '木':3, '金':4, '土':5, '火':6 }[mingNayin.slice(-1)] || 5;
 
-  /* --- symbolic star layout (NOT a professional chart) --- */
+  /* --- standard An Xing Jue placement of the fourteen major stars --- */
   const seed = hash([y, m, d, t, input.gender, input.name].join('|'));
   const r = rng(seed);
-  const ziweiZhi = (mingZhi + 2 + (d % 5) + (ju % 3)) % 12;
-  const tianfuZhi = (ziweiZhi + 6 + (ju % 2)) % 12;
+  const ziweiZhi = C.ziweiZhi(ju, lunar.day);
+  const tianfuZhi = C.tianfuZhi(ziweiZhi);
   const starsByZhi = Array.from({ length:12 }, function () { return []; });
   Object.keys(ZIWEI_SYSTEM).forEach(function (s) {
     const z = ((ziweiZhi + ZIWEI_SYSTEM[s]) % 12 + 12) % 12; starsByZhi[z].push(s);
@@ -355,7 +357,7 @@ function buildChart(input) {
     (balance > .6 ? '五行尚匀，顺势即可，不必另作张罗。' : dominant + '气偏盛，宜以静事养之，勿添新局。');
 
   return {
-    input:input, y:y, m:m, d:d, t:t, jie:jie, monthOrder:monthOrder,
+    input:input, y:y, m:m, d:d, t:t, jie:jie, monthOrder:monthOrder, lunar:lunar,
     chartYear:chartYear, yearGan:yearGan, yearZhi:yearZhi,
     pillars:pillars, dayGan:dayGan, dayZhi:dayZhi,
     wx:wx, wxPct:wxPct, dominant:dominant, weakest:weakest, balance:balance,
@@ -397,7 +399,7 @@ function makeReadings(c) {
     '<span class="q">' + esc(c.mingStars.slice(0, 2).join(' · ') || '空宫') + '</span>' +
     (c.oppStars.length ? '，三方会' + esc(c.oppStars.slice(0, 2).join('、')) : '') + '。' +
     esc(starText) + '星曜所主，只是动静与明暗之势，不指具体事期。';
-  const ziweiBasis = '参紫微星系逆布、天府星系顺布之相对格局，取「三方四正」会照之意。本站为意象简盘，星位以生辰意象排布，非专业命盘，不落流曜、四化与大小限。';
+  const ziweiBasis = '命宫以农历月自寅顺数、生时逆数而定，身宫顺数；宫干用五虎遁，纳音定五行局；紫微依「局数除日数，商数宫前走」口诀定位，天府依寅申轴对称，十四主星依紫微系逆布、天府系顺布。仅排主星，不落辅星、四化与大限。';
 
   const tarotBody =
     '过去得「' + esc(TAROT[c.cards[0].idx].n) + '」，现在得「' + esc(present.n) + '」' +
@@ -613,7 +615,7 @@ function renderReading(c) {
           '<div class="cs-block"><dt>五 行 局</dt><dd>命宫纳音 <b>' + esc(c.mingNayin) + '</b>，归入 <b>' + esc(c.juName) + '</b>。' +
             '局者，节奏之单位也；此处只取其名，不行大限、不推流曜。</dd></div>' +
         '</dl>' +
-        '<p class="cs-notice">此盘为意象简盘：星曜依生辰意象布列，取传统星系相对位置之意，并非专业紫微排盘，请勿用于术数研习或相互校对。</p>' +
+        '<p class="cs-notice">本盘仅排十四主星：命宫依农历月与生时，紫微依「局数除日数」标准口诀定位，天府依寅申轴对称，主星依紫微系逆布、天府系顺布。辅星、四化、大限未排，不作专业术数论断。</p>' +
       '</div>' +
     '</div>' +
   '</section>' +
@@ -674,10 +676,20 @@ function renderReading(c) {
   '</section>';
 
   const body = document.getElementById('reading-body');
-  body.innerHTML = html;
   const section = document.getElementById('reading');
+  window.__gxjLastInput = c.input;
+  body.innerHTML = html;
   section.hidden = false;
   observeReveals(section);
+
+  /* English reading is an independent scholarly rendering, not a gloss */
+  if (window.GXJI18N && window.GXJI18N.lang === 'en' && window.GXJEn) {
+    window.GXJEn.render(body, c, {
+      GAN:GAN, ZHI:ZHI, GAN_WX:GAN_WX, TAROT:TAROT, STAR_WORDS:STAR_WORDS,
+      WX_COLOR:WX_COLOR, SHENG:SHENG, KE:KE, esc:esc, gzi:gzIndex
+    });
+    return;
+  }
 
   /* animated bars */
   setTimeout(function () {
@@ -741,27 +753,34 @@ function fallbackCopy(text, done) {
   const ritual = document.getElementById('ritual');
   const rStep = document.getElementById('ritual-step');
   const rSub = document.getElementById('ritual-sub');
+  const I = window.GXJI18N;
+  if (I) I.applyStatic();
   try { dateEl.max = new Date().toISOString().slice(0, 10); } catch (e) {}
   dateEl.value = '2004-06-15';
 
-  const steps = [
-    ['推 四 柱', '以节气定月，以日辰起时'],
-    ['布 星 垣', '定命身二宫，列十四主星'],
-    ['抽 三 牌', '以生辰为种，取过去现在将来'],
-    ['合 参 成 盘', '三术各言其象，不落定数']
-  ];
+  function steps() {
+    return (window.GXRitual || []).map(function (pair) {
+      return [I ? I.get(pair[0]) : pair[0], I ? I.get(pair[1]) : pair[1]];
+    });
+  }
+  function msg(key, fallback) { return I ? I.get(key) : fallback; }
+  function showError(text) { errEl.textContent = text; errEl.hidden = false; }
+
+  document.getElementById('lang-toggle').addEventListener('click', function () {
+    if (I) I.toggle();
+  });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     errEl.hidden = true;
     const raw = dateEl.value;
-    if (!raw) { showError('请填写公历出生日期。'); return; }
+    if (!raw) { showError(msg('f.err.date', '请填写公历出生日期。')); return; }
     const parts = raw.split('-').map(Number);
     const y = parts[0], m = parts[1], d = parts[2];
     if (y < 1900 || y > new Date().getFullYear() || m < 1 || m > 12 || d < 1 || d > 31) {
-      showError('日期超出可推算范围（1900 年至今）。'); return;
+      showError(msg('f.err.range', '日期超出可推算范围（1900 年至今）。')); return;
     }
-    if (!document.getElementById('f-consent').checked) { showError('请先阅读并勾选边界声明。'); return; }
+    if (!document.getElementById('f-consent').checked) { showError(msg('f.err.consent', '请先阅读并勾选边界声明。')); return; }
 
     const input = {
       y:y, m:m, d:d,
@@ -771,12 +790,13 @@ function fallbackCopy(text, done) {
       place:(document.getElementById('f-place').value || '').trim()
     };
 
+    const S = steps();
     ritual.hidden = false;
     let k = 0;
-    rStep.textContent = steps[0][0]; rSub.textContent = steps[0][1];
+    rStep.textContent = S[0][0]; rSub.textContent = S[0][1];
     const timer = setInterval(function () {
       k++;
-      if (k < steps.length) { rStep.textContent = steps[k][0]; rSub.textContent = steps[k][1]; }
+      if (k < S.length) { rStep.textContent = S[k][0]; rSub.textContent = S[k][1]; }
       else {
         clearInterval(timer);
         const chart = buildChart(input);
@@ -788,8 +808,13 @@ function fallbackCopy(text, done) {
       }
     }, 560);
   });
-
-  function showError(msg) { errEl.textContent = msg; errEl.hidden = false; }
 })();
+
+/* Re-render the existing chart whenever the reader switches language */
+if (window.GXJI18N) window.GXJI18N.onChange(function () {
+  if (!window.__gxjLastInput) return;
+  var ch = buildChart(window.__gxjLastInput);
+  renderReading(ch);
+});
 
 })();
