@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="观星纪 · 以八字、紫微斗数与塔罗三术合参，观生命节律之起伏。文化意象体验，不预测寿命。">
+<title>观星纪 · THE ASTRAL LEDGER</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="观星纪 首页">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="7" stroke="currentColor" stroke-width=".7" opacity=".6"/><path d="M16 1v6M16 25v6M1 16h6M25 16h6" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="1.6" fill="currentColor"/></svg>
+    </span>
+    <span class="brand-text">观星纪</span>
+    <span class="brand-en">ASTRAL LEDGER</span>
+  </a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#method">三术</a>
+    <a href="#cast">起盘</a>
+    <a href="#boundary">边界</a>
+  </nav>
+  <a href="#cast" class="nav-cta">起 一 盘 <span aria-hidden="true">↗</span></a>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow reveal">卷 一 · 观 势 <span class="eyebrow-line"></span> EST. MMXXVI</p>
+      <h1 class="hero-title">
+        <span class="line reveal">命，<em>不可量</em></span>
+        <span class="line reveal">势，<em>可以观</em></span>
+      </h1>
+      <div class="hero-bottom">
+        <p class="hero-desc reveal">以四柱定其骨，以星垣布其象，以三牌取其喻。<br>三术合参，不为断定终点，只为看见起伏。</p>
+        <div class="hero-side reveal">
+          <span class="hero-index">01 / 04</span>
+          <a class="scroll-cue" href="#method">向下阅 <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-orbit" aria-hidden="true">
+      <svg viewBox="0 0 600 600" fill="none">
+        <circle cx="300" cy="300" r="270" stroke="currentColor" stroke-width=".6" opacity=".28"/>
+        <circle cx="300" cy="300" r="215" stroke="currentColor" stroke-width=".6" opacity=".2"/>
+        <circle cx="300" cy="300" r="160" stroke="currentColor" stroke-width=".6" opacity=".14"/>
+        <path d="M300 30v540M30 300h540M109 109l382 382M491 109L109 491" stroke="currentColor" stroke-width=".5" opacity=".1"/>
+        <circle cx="300" cy="30" r="3" fill="currentColor" opacity=".7"/>
+        <circle cx="570" cy="300" r="2.4" fill="currentColor" opacity=".5"/>
+        <circle cx="109" cy="491" r="2" fill="currentColor" opacity=".45"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section class="section method" id="method">
+    <div class="section-head reveal">
+      <span class="section-no">02</span>
+      <h2>三术合参</h2>
+      <p class="section-sub">THREE LENSES, ONE READING</p>
+    </div>
+    <p class="method-lead reveal">同一段生辰，换三种目光去看。<br>东方问「气」，星垣问「位」，塔罗问「喻」——彼此不作证明，只作回声。</p>
+
+    <div class="method-grid">
+      <article class="method-card reveal">
+        <div class="method-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><rect x="12" y="12" width="40" height="40" rx="2" stroke="currentColor"/><path d="M12 24h40M12 40h40M24 12v40M40 12v40" stroke="currentColor" opacity=".35"/><circle cx="32" cy="32" r="5" stroke="currentColor"/><path d="M32 27v10M27 32h10" stroke="currentColor"/></svg>
+        </div>
+        <span class="method-num">壹 · 01</span>
+        <h3>四柱八字</h3>
+        <p class="method-en">FOUR PILLARS</p>
+        <p>以生辰推年月日时四柱，观五行之偏全、日主之强弱。取其「气候」，不取其「定数」。</p>
+        <ul class="method-tags"><li>节气定月</li><li>五虎遁</li><li>五行分布</li></ul>
+      </article>
+      <article class="method-card reveal">
+        <div class="method-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="23" stroke="currentColor"/><circle cx="32" cy="32" r="15" stroke="currentColor" opacity=".45"/><path d="M32 9v46M9 32h46" stroke="currentColor" opacity=".3"/><circle cx="32" cy="9" r="2.6" fill="currentColor"/><circle cx="47" cy="47" r="2" fill="currentColor" opacity=".6"/><circle cx="17" cy="47" r="2" fill="currentColor" opacity=".6"/></svg>
+        </div>
+        <span class="method-num">贰 · 02</span>
+        <h3>紫微星垣</h3>
+        <p class="method-en">ZI WEI DOU SHU</p>
+        <p>定命身二宫，布十四主星于十二垣。看星曜彼此照会之势，取「格局气象」之意象。</p>
+        <ul class="method-tags"><li>命身二宫</li><li>三方四正</li><li>意象简盘</li></ul>
+      </article>
+      <article class="method-card reveal">
+        <div class="method-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><rect x="18" y="10" width="28" height="44" rx="3" stroke="currentColor"/><rect x="12" y="16" width="28" height="44" rx="3" stroke="currentColor" opacity=".45" transform="rotate(-9 12 16)"/><path d="M32 20l4 8 8 1-6 6 2 9-8-4-8 4 2-9-6-6 8-1z" stroke="currentColor" stroke-width=".8"/></svg>
+        </div>
+        <span class="method-num">叁 · 03</span>
+        <h3>塔罗三牌</h3>
+        <p class="method-en">TAROT SPREAD</p>
+        <p>以生辰为种子，抽过去、现在、将来三牌，正逆位各成一喻。它是镜子，不是判决书。</p>
+        <ul class="method-tags"><li>大阿卡纳</li><li>正逆位</li><li>三牌阵列</li></ul>
+      </article>
+    </div>
+
+    <div class="disclaimer-inline reveal">
+      <span class="disc-mark" aria-hidden="true">※</span>
+      <p><strong>关于「寿命」</strong> — 本站不推算岁数、不预言终点。所谓「生命节律」，是由五行均衡、星曜动静与牌意缓急合成的一段<strong>象征性曲线</strong>，用以观照不同阶段的养息节奏，仅此而已。</p>
+    </div>
+  </section>
+
+  <!-- CAST -->
+  <section class="section cast" id="cast">
+    <div class="section-head reveal">
+      <span class="section-no">03</span>
+      <h2>起 盘</h2>
+      <p class="section-sub">CAST YOUR CHART</p>
+    </div>
+
+    <form class="cast-form reveal" id="cast-form" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="f-name">称呼 <span class="opt">选填</span></label>
+          <input id="f-name" name="name" type="text" maxlength="16" placeholder="如何称呼你" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="f-date">公历生辰 <span class="req">必填</span></label>
+          <input id="f-date" name="date" type="date" min="1900-01-01" max="2026-11-09" required>
+        </div>
+        <div class="field">
+          <label for="f-hour">出生时辰 <span class="req">必填</span></label>
+          <select id="f-hour" name="hour" required>
+            <option value="0">子时 · 23:00–01:00</option>
+            <option value="1">丑时 · 01:00–03:00</option>
+            <option value="2">寅时 · 03:00–05:00</option>
+            <option value="3">卯时 · 05:00–07:00</option>
+            <option value="4">辰时 · 07:00–09:00</option>
+            <option value="5">巳时 · 09:00–11:00</option>
+            <option value="6" selected>午时 · 11:00–13:00</option>
+            <option value="7">未时 · 13:00–15:00</option>
+            <option value="8">申时 · 15:00–17:00</option>
+            <option value="9">酉时 · 17:00–19:00</option>
+            <option value="10">戌时 · 19:00–21:00</option>
+            <option value="11">亥时 · 21:00–23:00</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>性别 <span class="opt">用于称谓</span></label>
+          <div class="radio-row" role="radiogroup" aria-label="性别">
+            <label class="radio"><input type="radio" name="gender" value="qian" checked><span>乾造 · 男</span></label>
+            <label class="radio"><input type="radio" name="gender" value="kun"><span>坤造 · 女</span></label>
+          </div>
+        </div>
+        <div class="field field-wide">
+          <label for="f-place">出生地 <span class="opt">选填 · 不参与推算</span></label>
+          <input id="f-place" name="place" type="text" maxlength="24" placeholder="例如：厦门 / 中国香港" autocomplete="off">
+        </div>
+      </div>
+
+      <label class="consent">
+        <input type="checkbox" id="f-consent" required>
+        <span class="consent-box" aria-hidden="true"></span>
+        <span>我已阅读并理解<a href="#boundary" target="_self">边界声明</a>：本站为文化意象体验，不预测寿命、疾病与死亡，不构成任何医疗或人生决策建议。</span>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">起 盘 <span aria-hidden="true">→</span></button>
+        <p class="form-note">所有推算在你的浏览器本地完成，不上传、不留存。</p>
+      </div>
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+    </form>
+  </section>
+
+  <!-- READING -->
+  <section class="section reading" id="reading" hidden>
+    <div id="reading-body"></div>
+  </section>
+
+  <!-- BOUNDARY -->
+  <section class="section boundary" id="boundary">
+    <div class="section-head reveal">
+      <span class="section-no">04</span>
+      <h2>边 界</h2>
+      <p class="section-sub">THE BOUNDARY</p>
+    </div>
+    <div class="boundary-grid">
+      <div class="boundary-main reveal">
+        <p class="boundary-quote">「知其所止，而后可以观其所往。」</p>
+        <p>命理是一套延续千年的叙事语言，它擅长的是给混沌以形状、给不安以节奏，而不是给出答案。本站刻意保留模糊：所有断语皆取象征，不落具体年岁、不涉疾病祸福。</p>
+        <p>若你正为健康、寿命或生死之事感到困扰，请把它交给医生，或交给一个你信任的人——不要交给一张网页。</p>
+      </div>
+      <div class="boundary-list reveal">
+        <div class="b-item"><span>01</span><p>不输出寿命数字、死亡时间或任何可换算为岁数的预测。</p></div>
+        <div class="b-item"><span>02</span><p>「元气曲线」为意象化图形，无医学、统计或预测效力。</p></div>
+        <div class="b-item"><span>03</span><p>星盘为意象简盘，非专业排盘，请勿用于术数研习。</p></div>
+        <div class="b-item"><span>04</span><p>不上传、不存储、不共享任何填写信息。</p></div>
+        <div class="b-item"><span>05</span><p>仅供文化赏析与娱乐，未成年人请在陪伴下浏览。</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span>观星纪 · THE ASTRAL LEDGER</span>
+    <span>文化意象体验 · 非命理预测服务</span>
+    <span>MMXXVI</span>
+  </div>
+</footer>
+
+<!-- CAST RITUAL OVERLAY -->
+<div class="ritual" id="ritual" hidden aria-live="polite">
+  <div class="ritual-inner">
+    <svg class="ritual-ring" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+      <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width=".6" opacity=".3"/>
+      <circle cx="100" cy="100" r="66" stroke="currentColor" stroke-width=".6" opacity=".5"/>
+      <circle cx="100" cy="100" r="44" stroke="currentColor" stroke-width=".6" opacity=".3"/>
+      <circle class="ritual-spin" cx="100" cy="100" r="88" stroke="currentColor" stroke-width="1.4" stroke-dasharray="40 510" stroke-linecap="round"/>
+    </svg>
+    <p class="ritual-step" id="ritual-step">推 四 柱</p>
+    <p class="ritual-sub" id="ritual-sub">以节气定月，以日辰起时</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
