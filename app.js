@@ -758,12 +758,22 @@ function fallbackCopy(text, done) {
   try { dateEl.max = new Date().toISOString().slice(0, 10); } catch (e) {}
   dateEl.value = '2004-06-15';
 
+  const RITUAL_FALLBACK = [
+    ['推 四 柱', '以节气定月，以日辰起时'],
+    ['布 星 垣', '定命身二宫，列十四主星'],
+    ['抽 三 牌', '以生辰为种，取过去现在将来'],
+    ['合 参 成 盘', '三术各言其象，不落定数']
+  ];
   function steps() {
-    return (window.GXRitual || []).map(function (pair) {
-      return [I ? I.get(pair[0]) : pair[0], I ? I.get(pair[1]) : pair[1]];
+    var pairs = window.GXRitual || window.GXJRitual || RITUAL_FALLBACK;
+    var out = pairs.map(function (pair) {
+      var a = I ? I.get(pair[0]) : null;
+      var b = I ? I.get(pair[1]) : null;
+      return [a || pair[0], b || pair[1]];
     });
+    return out.length ? out : RITUAL_FALLBACK;
   }
-  function msg(key, fallback) { return I ? I.get(key) : fallback; }
+  function msg(key, fallback) { return (I && I.get(key)) || fallback; }
   function showError(text) { errEl.textContent = text; errEl.hidden = false; }
 
   document.getElementById('lang-toggle').addEventListener('click', function () {
@@ -799,12 +809,19 @@ function fallbackCopy(text, done) {
       if (k < S.length) { rStep.textContent = S[k][0]; rSub.textContent = S[k][1]; }
       else {
         clearInterval(timer);
-        const chart = buildChart(input);
-        renderReading(chart);
-        ritual.hidden = true;
-        setTimeout(function () {
-          document.getElementById('reading').scrollIntoView({ behavior:'smooth', block:'start' });
-        }, 120);
+        try {
+          const chart = buildChart(input);
+          renderReading(chart);
+          setTimeout(function () {
+            var rd = document.getElementById('reading');
+            if (rd && rd.scrollIntoView) rd.scrollIntoView({ behavior:'smooth', block:'start' });
+          }, 120);
+        } catch (err) {
+          try { console.error('[EPHEMERIS] chart failed:', err); } catch (e) {}
+          showError(msg('f.err.generic', '起盘出错：') + (err && err.message ? err.message : '未知错误'));
+        } finally {
+          ritual.hidden = true;
+        }
       }
     }, 560);
   });

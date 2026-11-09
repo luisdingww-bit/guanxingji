@@ -81,6 +81,7 @@ var UI = {
   'f.err.date':    { zh:'请填写公历出生日期。', en:'Please enter your Gregorian birth date.' },
   'f.err.range':   { zh:'日期超出可推算范围（1900 年至今）。', en:'Date outside the computable range (1900–today).' },
   'f.err.consent': { zh:'请先阅读并勾选边界声明。', en:'Please accept the Boundary Notes first.' },
+  'f.err.generic': { zh:'起盘出错：', en:'Chart failed: ' },
 
   'sec.sources':   { zh:'文献与算法', en:'SOURCES & METHOD' },
   'sec.sources.en':{ zh:'SOURCES & METHOD', en:'REPRODUCIBLE, CITED' },
@@ -252,7 +253,7 @@ window.GXJI18N = {
 
 /* Language + ritual steps live outside the strict dictionary so the
    reading engine can reuse the same keys at render time. */
-window.GXJRitual = [
+window.GXRitual = [
   ['ritual.1','ritual.1s'], ['ritual.2','ritual.2s'],
   ['ritual.3','ritual.3s'], ['ritual.4','ritual.4s']
 ];
