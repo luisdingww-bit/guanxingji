@@ -691,12 +691,18 @@ function renderReading(c) {
     card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
   });
 
+  if (window.GXJBold) window.GXJBold.enhance(body, c, {
+    GAN:GAN, ZHI:ZHI, GAN_WX:GAN_WX, TAROT:TAROT, STAR_WORDS:STAR_WORDS,
+    WX_ORDER:WX_ORDER, WX_COLOR:WX_COLOR, SHENG:SHENG, KE:KE,
+    esc:esc, clamp:clamp, rng:rng, hash:hash
+  });
+
   document.getElementById('btn-recast').addEventListener('click', function () {
     document.getElementById('cast').scrollIntoView({ behavior:'smooth', block:'start' });
   });
   document.getElementById('btn-copy').addEventListener('click', function () {
     const summary = [
-      '观星纪 · 命盘摘要（文化意象体验，非预测）',
+      '观星纪 · 命盘摘要（术数文化演绎）',
       '生辰：' + dateText,
       '四柱：' + c.pillars.map(function (p) { return p.name; }).join(' '),
       '日主：' + GAN[c.dayGan] + GAN_WX[c.dayGan] + ' · ' + c.strengthWord,
@@ -704,7 +710,7 @@ function renderReading(c) {
       '命宫主星：' + (c.mingStars.slice(0,2).join(' · ') || '空宫'),
       '三牌：' + c.cards.map(function (x) { return TAROT[x.idx].n + (x.rev ? '（逆）' : '（正）'); }).join(' / '),
       '本命牌：' + TAROT[c.lifeCard].n,
-      '说明：本站不推算寿命、岁数或任何具体事件。'
+      '说明：以上为术数文化演绎与算法推演，非医学诊断或事实预测。'
     ].join('\n');
     const done = function () { const b = document.getElementById('btn-copy'); b.textContent = '已 复 制 ✓'; setTimeout(function () { b.textContent = '复 制 命 盘 摘 要'; }, 1800); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
