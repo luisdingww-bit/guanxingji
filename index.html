@@ -228,7 +228,28 @@
   </div>
 </div>
 
+<audio id="bgm" loop preload="auto" src="bgm.mp3"></audio>
+
+<div class="bgm-bar" id="bgm-bar" role="group" aria-label="背景音控制">
+  <div class="bgm-hint" id="bgm-hint" hidden>点一下页面，开启背景音</div>
+  <button class="bgm-btn bgm-toggle" id="bgm-toggle" type="button" aria-label="播放背景音">
+    <svg id="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+    <svg id="ico-pause" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5h3v14H7zM14 5h3v14h-3z" fill="currentColor"/></svg>
+  </button>
+  <div class="bgm-meta">
+    <span class="bgm-title">星 律 · 背景音</span>
+    <span class="bgm-sub"><span class="bgm-loop">LOOP</span><span id="bgm-dur">--:--</span></span>
+  </div>
+  <button class="bgm-btn bgm-mute" id="bgm-mute" type="button" aria-label="静音">
+    <svg id="ico-vol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 010 7M18.5 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <svg id="ico-mute" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M17 9.5l5 5M22 9.5l-5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+  </button>
+  <input id="bgm-volume" class="bgm-vol" type="range" min="0" max="100" value="45" aria-label="音量大小">
+  <span class="bgm-val" id="bgm-val">45%</span>
+</div>
+
 <script src="app.js"></script>
 <script src="bold.js"></script>
+<script src="audio.js"></script>
 </body>
 </html>
