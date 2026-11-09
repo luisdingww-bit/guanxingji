@@ -59,7 +59,7 @@ const revealObserver = ('IntersectionObserver' in window)
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add('in'); revealObserver.unobserve(en.target); }
       });
-    }, { threshold: .12, rootMargin: '0px 0px -40px 0px' })
+    }, { threshold: .01, rootMargin: '0px' })
   : null;
 function observeReveals(root) {
   (root || document).querySelectorAll('.reveal:not(.in)').forEach(function (el, i) {
@@ -685,6 +685,9 @@ function renderReading(c) {
   body.innerHTML = html;
   section.hidden = false;
   observeReveals(section);
+  /* Result sections must never depend on scroll-triggered fades: the last
+     section can be taller than 8 viewports, so an IO threshold never fires. */
+  section.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
 
   const D = {
     GAN:GAN, ZHI:ZHI, GAN_WX:GAN_WX, TAROT:TAROT, STAR_WORDS:STAR_WORDS,
@@ -767,6 +770,30 @@ function fallbackCopy(text, done) {
   const rSub = document.getElementById('ritual-sub');
   const I = window.GXJI18N;
   if (I) I.applyStatic();
+
+  /* ONE time field: derive the traditional double-hour from the clock time. */
+  const ZHI_ZH = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const HOUR_RANGE = ['23:00–01:00','01:00–03:00','03:00–05:00','05:00–07:00',
+                      '07:00–09:00','09:00–11:00','11:00–13:00','13:00–15:00',
+                      '15:00–17:00','17:00–19:00','19:00–21:00','21:00–23:00'];
+  const timeInput = document.getElementById('f-time');
+  const hourOut = document.getElementById('hour-derived');
+  function paintHour() {
+    if (!timeInput || !hourOut) return;
+    const v = timeInput.value || '12:00';
+    const a = v.split(':');
+    let mm = parseInt(a[0], 10) * 60 + parseInt(a[1], 10);
+    if (isNaN(mm)) mm = 720;
+    const t = Math.floor(((mm + 60) % 1440) / 120);
+    const en = I && I.lang === 'en';
+    const nm = en ? (I.TERMS.branch[t] + ' hour') : (ZHI_ZH[t] + '时');
+    const pre = I ? I.get('f.hour.derived') : null;
+    hourOut.textContent = (pre || (en ? 'Derived double-hour: ' : '推定时辰：')) + nm + ' · ' + HOUR_RANGE[t];
+  }
+  if (timeInput) timeInput.addEventListener('input', paintHour);
+  window.__gxjPaintHour = paintHour;
+  paintHour();
+
   try { dateEl.max = new Date().toISOString().slice(0, 10); } catch (e) {}
   dateEl.value = '2004-06-15';
 
@@ -812,9 +839,11 @@ function fallbackCopy(text, done) {
       minutes = parseInt(tp[0], 10) * 60 + parseInt(tp[1], 10);
       if (isNaN(minutes)) minutes = null;
     }
+    const refMinutes = minutes == null ? 720 : minutes;
+    const clockT = Math.floor(((refMinutes + 60) % 1440) / 120);
     const input = {
       y:y, m:m, d:d,
-      t:parseInt(document.getElementById('f-hour').value, 10),
+      t:clockT, clockT:clockT,
       gender:(form.querySelector('input[name=gender]:checked') || {}).value || 'qian',
       name:(document.getElementById('f-name').value || '').trim(),
       place:(document.getElementById('f-place').value || '').trim(),

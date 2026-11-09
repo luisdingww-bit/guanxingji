@@ -131,17 +131,6 @@
           <input id="f-date" name="date" type="date" min="1900-01-01" max="2026-11-09" required>
         </div>
         <div class="field">
-          <label for="f-hour"><span data-i18n="f.hour">出生时辰</span> <span class="req" data-i18n="f.date.req">必填</span></label>
-          <select id="f-hour" name="hour" required>
-            <option value="0">子时 · 23:00–01:00</option><option value="1">丑时 · 01:00–03:00</option>
-            <option value="2">寅时 · 03:00–05:00</option><option value="3">卯时 · 05:00–07:00</option>
-            <option value="4">辰时 · 07:00–09:00</option><option value="5">巳时 · 09:00–11:00</option>
-            <option value="6" selected>午时 · 11:00–13:00</option><option value="7">未时 · 13:00–15:00</option>
-            <option value="8">申时 · 15:00–17:00</option><option value="9">酉时 · 17:00–19:00</option>
-            <option value="10">戌时 · 19:00–21:00</option><option value="11">亥时 · 21:00–23:00</option>
-          </select>
-        </div>
-        <div class="field">
           <label><span data-i18n="f.gender">性别</span> <span class="opt" data-i18n="f.gender.opt">用于称谓</span></label>
           <div class="radio-row" role="radiogroup" aria-label="Sex">
             <label class="radio"><input type="radio" name="gender" value="qian" checked><span data-i18n="f.gender.q">乾造 · 男</span></label>
@@ -149,13 +138,14 @@
           </div>
         </div>
         <div class="field field-wide">
-          <label for="f-place"><span data-i18n="f.place">出生地</span> <span class="opt" data-i18n="f.place.opt">选填 · 不参与推算</span></label>
+          <label for="f-place"><span data-i18n="f.place">出生地</span> <span class="opt" data-i18n="f.place.opt">选填 · 参与真太阳时校正</span></label>
           <input id="f-place" name="place" type="text" maxlength="24" data-i18n-ph="f.place.ph" placeholder="例如：厦门 / 中国香港" autocomplete="off">
         </div>
-        <div class="field field-wide">
-          <label for="f-time"><span data-i18n="f.time">出生时刻</span> <span class="opt" data-i18n="f.time.opt">选填 · 用于真太阳时校正</span></label>
-          <input id="f-time" name="time" type="time">
-          <p class="field-hint" data-i18n="f.time.hint">留空则按时辰中点估算。填写城市名可自动带出经度。</p>
+        <div class="field">
+          <label for="f-time"><span data-i18n="f.time">出生时刻</span> <span class="opt" data-i18n="f.time.opt">自动判定时辰</span></label>
+          <input id="f-time" name="time" type="time" value="12:00">
+          <p class="hour-derived" id="hour-derived">推定时辰：午时 · 11:00–13:00</p>
+          <p class="field-hint" data-i18n="f.time.hint">一个输入同时判定时辰与做真太阳时校正；不知道具体分钟可保留默认值。</p>
         </div>
         <div class="field field-wide">
           <label><span data-i18n="f.scale">断语尺度</span> <span class="req" data-i18n="f.scale.req">默认大胆</span></label>
@@ -297,12 +287,12 @@
   </div>
 </div>
 
-<script src="core.js?v=20261109c"></script>
-<script src="geo.js?v=20261109c"></script>
-<script src="i18n.js?v=20261109c"></script>
-<script src="app.js?v=20261109c"></script>
-<script src="bold.js?v=20261109c"></script>
-<script src="en.js?v=20261109c"></script>
-<script src="audio.js?v=20261109c"></script>
+<script src="core.js?v=20261109d"></script>
+<script src="geo.js?v=20261109d"></script>
+<script src="i18n.js?v=20261109d"></script>
+<script src="app.js?v=20261109d"></script>
+<script src="bold.js?v=20261109d"></script>
+<script src="en.js?v=20261109d"></script>
+<script src="audio.js?v=20261109d"></script>
 </body>
 </html>

@@ -65,12 +65,13 @@ var UI = {
   'f.gender.q':    { zh:'乾造 · 男', en:'Male · Qian' },
   'f.gender.k':    { zh:'坤造 · 女', en:'Female · Kun' },
   'f.place':       { zh:'出生地', en:'BIRTHPLACE' },
-  'f.place.opt':   { zh:'选填 · 不参与推算', en:'OPTIONAL · NOT USED' },
+  'f.place.opt':   { zh:'选填 · 参与真太阳时校正', en:'OPTIONAL · USED FOR SOLAR-TIME CORRECTION' },
   'f.place.ph':    { zh:'例如：厦门 / 中国香港', en:'e.g. Xiamen / Hong Kong, China' },
-  'f.time':        { zh:'出生时刻', en:'EXACT BIRTH TIME' },
-  'f.time.opt':    { zh:'选填 · 用于真太阳时校正', en:'OPTIONAL · FOR SOLAR-TIME CORRECTION' },
-  'f.time.hint':   { zh:'留空则按时辰中点估算。填写城市名可自动带出经度。',
-                     en:'Leave blank to use the mid-point of the double-hour. A city name enables longitude correction.' },
+  'f.time':        { zh:'出生时刻', en:'BIRTH TIME' },
+  'f.time.opt':    { zh:'自动判定时辰', en:'DERIVES THE DOUBLE-HOUR' },
+  'f.time.hint':   { zh:'一个输入同时判定时辰与做真太阳时校正；不知道具体分钟可保留默认值。',
+                     en:'One field derives the double-hour and drives the solar-time correction; keep the default if you do not know the exact minute.' },
+  'f.hour.derived':{ zh:'推定时辰：', en:'Derived double-hour: ' },
   'f.scale':       { zh:'断语尺度', en:'READING REGISTER' },
   'f.scale.req':   { zh:'默认大胆', en:'DIRECT BY DEFAULT' },
   'f.scale.bold':  { zh:'大胆直断 · 给寿元、运势与生活细节', en:'DIRECT · longevity, fortune and life details' },
@@ -216,15 +217,6 @@ function applyStatic() {
 
   document.body.classList.toggle('lang-en', lang === 'en');
 
-  /* the twelve double-hour options carry their own bilingual labels */
-  var ZHI_ZH = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var HOURS = ['23:00–01:00','01:00–03:00','03:00–05:00','05:00–07:00','07:00–09:00','09:00–11:00',
-               '11:00–13:00','13:00–15:00','15:00–17:00','17:00–19:00','19:00–21:00','21:00–23:00'];
-  var hourSel = document.getElementById('f-hour');
-  if (hourSel) hourSel.querySelectorAll('option').forEach(function (op, i) {
-    if (HOURS[i]) op.textContent = (lang === 'en' ? TERMS.branch[i] + ' · ' : ZHI_ZH[i] + '时 · ') + HOURS[i];
-  });
-
   /* pipe-separated tag lists */
   document.querySelectorAll('[data-i18n-list]').forEach(function (ul) {
     var v = get(ul.getAttribute('data-i18n-list'));
@@ -238,6 +230,7 @@ function applyStatic() {
   if (mt) mt.setAttribute('aria-label', get('bgm.mute'));
   var vol = document.getElementById('bgm-volume');
   if (vol) vol.setAttribute('aria-label', get('bgm.volume'));
+  if (window.__gxjPaintHour) window.__gxjPaintHour();
 }
 function setLang(next) {
   if (next !== 'zh' && next !== 'en') return;
