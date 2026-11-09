@@ -153,6 +153,11 @@
           <input id="f-place" name="place" type="text" maxlength="24" data-i18n-ph="f.place.ph" placeholder="例如：厦门 / 中国香港" autocomplete="off">
         </div>
         <div class="field field-wide">
+          <label for="f-time"><span data-i18n="f.time">出生时刻</span> <span class="opt" data-i18n="f.time.opt">选填 · 用于真太阳时校正</span></label>
+          <input id="f-time" name="time" type="time">
+          <p class="field-hint" data-i18n="f.time.hint">留空则按时辰中点估算。填写城市名可自动带出经度。</p>
+        </div>
+        <div class="field field-wide">
           <label><span data-i18n="f.scale">断语尺度</span> <span class="req" data-i18n="f.scale.req">默认大胆</span></label>
           <div class="radio-row scale-row" role="radiogroup" aria-label="Reading register">
             <label class="radio"><input type="radio" name="scale" value="bold" checked><span data-i18n="f.scale.bold">大胆直断 · 给寿元、运势与生活细节</span></label>
@@ -292,11 +297,12 @@
   </div>
 </div>
 
-<script src="core.js?v=20261109b"></script>
-<script src="i18n.js?v=20261109b"></script>
-<script src="app.js?v=20261109b"></script>
-<script src="bold.js?v=20261109b"></script>
-<script src="en.js?v=20261109b"></script>
-<script src="audio.js?v=20261109b"></script>
+<script src="core.js?v=20261109c"></script>
+<script src="geo.js?v=20261109c"></script>
+<script src="i18n.js?v=20261109c"></script>
+<script src="app.js?v=20261109c"></script>
+<script src="bold.js?v=20261109c"></script>
+<script src="en.js?v=20261109c"></script>
+<script src="audio.js?v=20261109c"></script>
 </body>
 </html>

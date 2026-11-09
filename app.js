@@ -217,7 +217,11 @@ function pick(arr, r) { return arr[Math.floor(r() * arr.length)]; }
    CHART ENGINE
    ============================================================ */
 function buildChart(input) {
-  const y = input.y, m = input.m, d = input.d, t = input.t;
+  const y = input.y, m = input.m, d = input.d, t0 = input.t;
+  const corr = window.GXJGeo
+    ? window.GXJGeo.correct({ y:y, m:m, d:d, t:t0, place:input.place, minutes:input.minutes })
+    : { t:t0, dayOffset:0, applied:false, clockT:t0 };
+  const t = corr.t;
 
   /* --- calendrical core: computed solar terms + lunar conversion --- */
   const C = window.GXJCore;
@@ -239,7 +243,7 @@ function buildChart(input) {
   const monthZhi = jieInfo.zhi;
 
   /* --- day pillar: Julian day number --- */
-  const dayIdx = C.dayPillarIndex(y, m, d);
+  const dayIdx = ((C.jdn(y, m, d) + corr.dayOffset + 49) % 60 + 60) % 60;
   const dayGan = dayIdx % 10, dayZhi = dayIdx % 12;
 
   /* --- hour pillar: Five Rats rule --- */
@@ -357,7 +361,7 @@ function buildChart(input) {
     (balance > .6 ? '五行尚匀，顺势即可，不必另作张罗。' : dominant + '气偏盛，宜以静事养之，勿添新局。');
 
   return {
-    input:input, y:y, m:m, d:d, t:t, jie:jie, monthOrder:monthOrder, lunar:lunar,
+    input:input, y:y, m:m, d:d, t:t, clockT:t0, corr:corr, jie:jie, monthOrder:monthOrder, lunar:lunar,
     chartYear:chartYear, yearGan:yearGan, yearZhi:yearZhi,
     pillars:pillars, dayGan:dayGan, dayZhi:dayZhi,
     wx:wx, wxPct:wxPct, dominant:dominant, weakest:weakest, balance:balance,
@@ -682,12 +686,17 @@ function renderReading(c) {
   section.hidden = false;
   observeReveals(section);
 
+  const D = {
+    GAN:GAN, ZHI:ZHI, GAN_WX:GAN_WX, TAROT:TAROT, STAR_WORDS:STAR_WORDS,
+    WX_COLOR:WX_COLOR, WX_ORDER:WX_ORDER, SHENG:SHENG, KE:KE,
+    esc:esc, clamp:clamp, hash:hash, rng:rng, gzi:gzIndex
+  };
+  const lang = window.GXJI18N ? window.GXJI18N.lang : 'zh';
+
   /* English reading is an independent scholarly rendering, not a gloss */
-  if (window.GXJI18N && window.GXJI18N.lang === 'en' && window.GXJEn) {
-    window.GXJEn.render(body, c, {
-      GAN:GAN, ZHI:ZHI, GAN_WX:GAN_WX, TAROT:TAROT, STAR_WORDS:STAR_WORDS,
-      WX_COLOR:WX_COLOR, SHENG:SHENG, KE:KE, esc:esc, gzi:gzIndex
-    });
+  if (lang === 'en' && window.GXJEn) {
+    window.GXJEn.render(body, c, D);
+    if (window.GXJGeo) window.GXJGeo.append(body, c, D, lang);
     return;
   }
 
@@ -734,6 +743,9 @@ function renderReading(c) {
     document.querySelectorAll('#reading .el-fill').forEach(function (el) { el.style.width = el.dataset.w + '%'; });
     setTimeout(function () { window.print(); }, 80);
   });
+
+  /* place / direction / calibration modules (bilingual inside geo.js) */
+  if (window.GXJGeo) window.GXJGeo.append(body, c, D, lang);
 }
 function fallbackCopy(text, done) {
   const ta = document.createElement('textarea');
@@ -792,12 +804,21 @@ function fallbackCopy(text, done) {
     }
     if (!document.getElementById('f-consent').checked) { showError(msg('f.err.consent', '请先阅读并勾选边界声明。')); return; }
 
+    const timeEl = document.getElementById('f-time');
+    const timeVal = timeEl && timeEl.value ? timeEl.value : '';
+    let minutes = null;
+    if (timeVal) {
+      const tp = timeVal.split(':');
+      minutes = parseInt(tp[0], 10) * 60 + parseInt(tp[1], 10);
+      if (isNaN(minutes)) minutes = null;
+    }
     const input = {
       y:y, m:m, d:d,
       t:parseInt(document.getElementById('f-hour').value, 10),
       gender:(form.querySelector('input[name=gender]:checked') || {}).value || 'qian',
       name:(document.getElementById('f-name').value || '').trim(),
-      place:(document.getElementById('f-place').value || '').trim()
+      place:(document.getElementById('f-place').value || '').trim(),
+      minutes:minutes
     };
 
     const S = steps();
