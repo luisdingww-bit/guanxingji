@@ -478,3 +478,60 @@ a{color:inherit; text-decoration:none}
   .reading .dt-tag,.reading .lf-k{color:#8a6b2f !important}
   .reading .bold-sec{opacity:1 !important; transform:none !important; animation:none !important}
 }
+
+/* --- background audio player --- */
+.bgm-bar{
+  position:fixed; right:24px; bottom:24px; z-index:45;
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px; border:1px solid var(--line); border-radius:2px;
+  background:rgba(10,11,15,.84); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 12px 44px rgba(0,0,0,.55);
+  transition:border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.bgm-bar.is-playing{border-color:rgba(200,168,107,.5); box-shadow:0 12px 44px rgba(0,0,0,.55),0 0 30px rgba(200,168,107,.09)}
+.bgm-btn{
+  flex:0 0 32px; width:32px; height:32px; display:grid; place-items:center;
+  background:transparent; border:1px solid var(--line); color:var(--gold-lit);
+  cursor:pointer; padding:0; transition:background .22s,border-color .22s,color .22s;
+}
+.bgm-btn svg{width:16px; height:16px; display:block}
+.bgm-btn:hover{background:rgba(200,168,107,.12); border-color:var(--gold)}
+.bgm-btn:focus-visible{outline:2px solid var(--gold-lit); outline-offset:2px}
+.bgm-toggle{color:var(--gold-lit)}
+.bgm-mute{border-color:transparent; color:var(--muted)}
+.bgm-mute:hover{color:var(--gold-lit); border-color:var(--line)}
+.bgm-meta{display:flex; flex-direction:column; gap:1px; min-width:104px}
+.bgm-title{font-family:var(--serif); font-size:12px; letter-spacing:.14em; color:var(--ink); white-space:nowrap}
+.bgm-sub{display:flex; align-items:center; gap:8px; font-family:var(--display); font-size:10px; letter-spacing:.18em; color:var(--muted-2)}
+.bgm-loop{border:1px solid var(--line); padding:0 5px; color:var(--gold-dim); font-size:9px; letter-spacing:.14em}
+.bgm-vol{
+  -webkit-appearance:none; appearance:none; width:92px; height:3px;
+  background:rgba(255,255,255,.16); outline:none; cursor:pointer; border-radius:0;
+}
+.bgm-vol::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:11px; height:11px; border-radius:50%;
+  background:var(--gold); border:2px solid #0b0c10; box-shadow:0 0 0 1px var(--gold); cursor:pointer;
+}
+.bgm-vol::-moz-range-thumb{
+  width:9px; height:9px; border-radius:50%;
+  background:var(--gold); border:2px solid #0b0c10; box-shadow:0 0 0 1px var(--gold); cursor:pointer;
+}
+.bgm-vol:focus-visible{outline:2px solid var(--gold-lit); outline-offset:6px}
+.bgm-val{font-family:var(--display); font-size:12px; color:var(--muted); min-width:34px; text-align:right}
+.bgm-hint{
+  position:absolute; bottom:calc(100% + 10px); right:0; white-space:nowrap;
+  font-family:var(--serif); font-size:11.5px; letter-spacing:.1em; color:var(--gold-lit);
+  background:rgba(14,15,20,.95); border:1px solid var(--line); padding:8px 12px;
+  animation:hintPulse 2.4s ease-in-out infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:.75}50%{opacity:1}}
+@media (max-width:720px){
+  .bgm-bar{right:auto; left:50%; transform:translateX(-50%); bottom:12px; width:calc(100% - 24px); gap:9px; padding:9px 10px}
+  .bgm-meta{min-width:0; flex:1}
+  .bgm-title{font-size:11px; letter-spacing:.08em}
+  .bgm-vol{width:64px}
+  .bgm-val{min-width:30px; font-size:11px}
+  .bgm-hint{right:0}
+}
+@media (prefers-reduced-motion:reduce){ .bgm-hint{animation:none} }
+@media print{ .bgm-bar,.bgm-hint{display:none !important} }
