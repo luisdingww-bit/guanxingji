@@ -168,6 +168,72 @@ var GROUPS = {
   out: { zh:'境外区域', en:'Overseas regions' }
 };
 
+
+/* Three-dimensional regional reading, generated from phase + group + score. */
+var INDUSTRY = {
+  '木':{ zh:'教育、文创、生长型业务与需要长期培育的领域', en:'education, cultural work, and any field that grows slowly and needs patience' },
+  '火':{ zh:'传媒、科技、能源与需要曝光度、传播力的行业', en:'media, technology, energy and fields that reward visibility and reach' },
+  '土':{ zh:'地产、基建、运营、供应链与需要承载力的岗位', en:'property, infrastructure, operations and supply-chain roles that reward reliability' },
+  '金':{ zh:'制造、金融、法务、标准与需要裁断执行力的方向', en:'manufacturing, finance, legal work and standards-driven roles that reward decisiveness' },
+  '水':{ zh:'贸易、物流、跨域协作与需要流动、适配力的行当', en:'trade, logistics and cross-border coordination that reward mobility and adaptability' }
+};
+var PEOPLE = {
+  cn:{ zh:'熟人网络密度高，关系靠时间累积；换城市等于把隐性资产重新建一遍。',
+       en:'Dense established networks, accumulated over years. Changing city means rebuilding that invisible capital from scratch.' },
+  hmt:{ zh:'跨境接口多，规则与节奏介于境内与海外之间，适合做「两头都懂」的角色。',
+        en:'Many cross-border interfaces; rules and tempo sit between the mainland and overseas. Well suited to people who can read both sides.' },
+  out:{ zh:'关系网需重建，身份与资历要重新被认证；短期孤独感高，长期自主性也高。',
+        en:'Networks must be rebuilt and credentials re-recognised. Short-term isolation is higher; so is long-term autonomy.' }
+};
+var SHENG_STATIC = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+function regionNoteEx(reg, aff, score, lang) {
+  var p = aff.primary, w = reg.wx;
+  var industry = INDUSTRY[w] || INDUSTRY['土'];
+  var people = PEOPLE[reg.g];
+  var strong = score >= 70, weak = score < 48;
+  var pace = lang==='en'
+    ? (strong ? 'The phase relation is a tailwind: a move here can be made earlier rather than later, with a two-to-three-year horizon.' :
+       weak ? 'The phase relation asks for caution: test with a short stint or a project before committing residence.' :
+              'A neutral relation: treat it as a steady option, and let the concrete opportunity decide rather than the compass.')
+    : (strong ? '五行同气或相生，属顺风位；若有实质机会，可较早动，以二至三年为观察期。' :
+       weak ? '五行相制，宜先以短期驻点或项目试水，不宜一步到位把生活重心搬过去。' :
+              '不冲不扶，属平稳可选；让具体机会来决定，而不是让方位替你决定。');
+  var relation = lang==='en'
+    ? 'This region is '+(w===p?'the same phase as':(SHENG_STATIC[w]===p?'generating':'in a mixed relation with'))+' the favoured '+PHASE_EN[p]+'.'
+    : '此区五行属'+w+'，与喜用'+p+(w===p?'同气':'相对')+'。';
+  return '<div class="reg-dims">' +
+    '<p><b>'+(lang==='en'?'Industry':'行业倾向')+'</b> '+h(Z(industry,lang))+'。</p>' +
+    '<p><b>'+(lang==='en'?'People & environment':'人际与环境')+'</b> '+h(Z(people,lang))+'</p>' +
+    '<p><b>'+(lang==='en'?'Pace':'节奏建议')+'</b> '+h(pace)+' <span class="reg-rel">'+h(relation)+'</span></p>' +
+    '</div>';
+}
+function groupIntro(g, aff, lang) {
+  var txt = {
+    cn:{ zh:'境内区域：喜用方位主要改写的是「节奏」而非「命格」。同气之位省力，相制之位费力，但格局本身不因迁徙而变。',
+         en:'Within mainland China: the favoured direction changes tempo, not structure. A same-phase location reduces friction; a controlling one adds it. The natal chart itself does not change with a move.' },
+    hmt:{ zh:'中国港澳台地区：同属境内，但制度与接口更外向，五行上多取滨海火／东南木象，适合需要跨制度协调的人。',
+          en:"China's Hong Kong, Macao and Taiwan regions: still within China, but with more outward-facing institutions and interfaces. Symbolically coastal Fire / south-eastern Wood — suited to work that spans different systems." },
+    out:{ zh:'境外区域：距离放大的是「重建成本」，不是吉凶本身。喜用相生之位能减一点适应摩擦，但语言、资历认证与关系网仍要自己补。',
+          en:'Overseas regions: distance amplifies rebuilding cost, not fortune. A generating phase softens some friction, but language, credential recognition and networks still have to be rebuilt.' }
+  };
+  return '<p class="reg-intro">'+h(Z(txt[g],lang))+'</p>';
+}
+function solarEssay(c, corr, lang) {
+  if (!corr.applied) return '';
+  return '<div class="geo-essay"><h5>'+(lang==='en'?'Why the correction changes the whole chart':'为什么这一步会改变整张盘')+'</h5><p>'+
+    (lang==='en'
+      ? 'Bazi assigns the month by solar terms and the hour by the Sun\'s local position, not by the clock on the wall. At ' + corr.lon.toFixed(2) + '°E the clock is ' + (corr.delta>=0?'+':'') + corr.delta.toFixed(1) + ' minutes from the zone meridian ' + Number(corr.ref).toFixed(0) + '°E, plus ' + corr.eq.toFixed(1) + ' minutes of equation of time. Near a double-hour boundary this is enough to move the Hour Pillar, which in turn moves the Life Palace and the whole Zi Wei star layout' + (corr.dayOffset ? ', and here it even crosses midnight, so the Day Pillar advances by one' : '') + '. Two people born at the same wall-clock time in different longitudes can therefore legitimately receive different charts. Birthplace is not decoration.'
+      : '八字以节气定月、以当地太阳位置定时，不以墙上的钟为准。在 '+corr.lon.toFixed(2)+'°E，钟表时相对本时区中央经线 '+Number(corr.ref).toFixed(0)+'°E 差 '+(corr.delta>=0?'+':'')+corr.delta.toFixed(1)+' 分钟，再加均时差 '+corr.eq.toFixed(1)+' 分钟。若生在时辰交界，这足以换掉时柱；时柱一换，紫微命宫与十四主星全盘跟着改'+(corr.dayOffset?'；本例更跨过子夜，日柱亦顺延一天':'')+'。所以同一钟表时刻、不同经度出生的人，本就该得到不同的盘——出生地不是装饰字段。')+
+    '</p></div>';
+}
+function directionEssay(c, aff, lang) {
+  return '<div class="geo-essay"><h5>'+(lang==='en'?'Favoured direction in practice':'喜用方位实际怎么用')+'</h5><p>'+
+    (lang==='en'
+      ? 'The favoured '+PHASE_EN[aff.primary]+' points '+(aff.dir.deg===null?'inward, toward consolidation':aff.dir.en)+'. Read this as a question of environment: does the place make your characteristic way of working easier or harder? A same-phase location reduces friction in daily routine; a controlling one demands more structure. It is not a claim that luck is physically stored in a compass direction, and it is not immigration, employment or investment advice. '+(c.corr && c.corr.applied?'Your entered birthplace is already used for the solar-time correction above; the compass is a separate, symbolic layer.':'Enter a birthplace to enable the solar-time layer.')
+      : '喜用'+h(aff.primary)+'指向'+(aff.dir.deg===null?'中央，宜守成收束':'「'+h(aff.dir.zh)+'」')+'。把它当成一个关于环境的问题：这个地方，是让你惯常的做事方式更省力，还是更费力？同气之位减摩擦，相制之位要求你多立规矩。它不意味着「运气藏在某个方位里」，更不是移民、就业或投资建议。'+(c.corr && c.corr.applied?'你填的出生地已用于上方真太阳时校正；罗盘是另一层象意，不与历法混用。':'填入出生地即可启用历法校正层。'))+
+    '</p></div>';
+}
+
 function regionScore(reg, aff, D, cal) {
   var SH = D.SHENG, KE = D.KE, p = aff.primary, w = reg.wx;
   var base = 52;
@@ -372,9 +438,9 @@ function regionHTML(c, aff, D, cal, lang) {
         '<span class="reg-score">'+s+'</span></div>' +
         '<div class="reg-bar"><span style="width:'+s+'%;background:'+DIR[r.wx].color+'"></span></div>' +
         '<p class="reg-sub">'+h(Z(r.sub,lang))+'</p>' +
-        '<p class="reg-note">'+h(regionNote(r, aff, s, lang))+'</p></div>';
+        '<div class="reg-note">'+regionNoteEx(r, aff, s, lang)+'</div></div>';
     }).join('');
-    return '<div class="reg-group"><h5>'+h(Z(GROUPS[g],lang))+'</h5>'+items+'</div>';
+    return '<div class="reg-group"><h5>'+h(Z(GROUPS[g],lang))+'</h5>'+groupIntro(g, aff, lang)+items+'</div>';
   }).join('');
 }
 
@@ -438,13 +504,14 @@ function append(body, c, D, lang) {
   '<div class="read-section geo-sec" id="geo-module">' +
     '<div class="read-section-head"><span class="rs-no">X</span><h3 class="rs-title">'+titleA+'</h3><span class="rs-en">PLACE &amp; DIRECTION</span></div>' +
     '<p class="geo-lead">'+lead+'</p>' +
+    directionEssay(c, aff, lang) + solarEssay(c, corr, lang) +
     '<div class="geo-layout"><div class="geo-compass">' + compassSVG(aff, corr, lang) +
       '<div class="compass-cap">'+(lang==='en'
         ? 'Favoured phase <b>'+PHASE_EN[aff.primary]+'</b> · direction <b>'+aff.dir.en+'</b>'
         : '喜用 <b>'+aff.primary+'</b> · 方位 <b>'+aff.dir.zh+'</b>')+'</div>' +
       '<p class="aff-reason">'+h(Z(aff.reason,lang))+'</p>' +
     '</div>' + solarCard(c, corr, lang) + '</div>' +
-    '<h4 class="reg-title">'+(lang==='en'?'Regional fit':'区域适配')+'</h4>' +
+    '<h4 class="reg-title">'+(lang==='en'?'Regional fit · three dimensions':'区域适配 · 三维展开')+'</h4>' +
     '<p class="geo-lead">'+regionLead+'</p>' +
     '<div class="reg-grid" id="reg-grid">'+regionHTML(c, aff, D, null, lang)+'</div>' +
   '</div>' +

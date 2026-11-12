@@ -63,6 +63,50 @@ var KX = {
   '澤':17,'泽':17,'諾':16,'诺':16,'謹':18,'鵬':19,'軒':10
 };
 var COMPOUND = ['歐陽','欧阳','司馬','司马','諸葛','诸葛','上官','慕容','夏侯','皇甫','尉遲','尉迟','公孫','公孙','長孫','长孙'];
+/* --- decoded public dataset (20k+ Kangxi stroke entries) --- */
+var DATA = window.GXJNamingData || { kx:'', wx:'', shuli81:{}, sancai:{} };
+var KX_MAP = {}, WX_MAP = {}, PH_CODE = {'1':'木','2':'火','3':'土','4':'金','5':'水'};
+(function () {
+  var s = DATA.kx || '';
+  for (var i = 0; i + 2 < s.length; i += 3) KX_MAP[s[i]] = parseInt(s.slice(i+1, i+3), 10);
+  var w = DATA.wx || '';
+  for (var j = 0; j + 1 < w.length; j += 2) WX_MAP[w[j]] = PH_CODE[w[j+1]];
+})();
+var SHULI = DATA.shuli81 || {}, SANCAI = DATA.sancai || {};
+var DATA_COUNT = Object.keys(KX_MAP).length;
+function strokeOf(ch) {
+  if (KX_MAP[ch] !== undefined) return KX_MAP[ch];
+  if (KX[ch] !== undefined) return KX[ch];
+  return null;
+}
+function phaseOf(ch) { return WX_MAP[ch] || null; }
+
+var TIER_ESSAY = {
+  great:{ zh:'此数属大吉，主气势完足、贵人易得，落在哪一格，哪一格所管的人生段落便容易顺势而成。',
+          en:'This is a highly auspicious numeral: momentum is ample and helpers tend to appear without being sought. Whichever grid it occupies, the life phase governed by that grid tends to unfold with the current rather than against it.' },
+  good:{ zh:'此数属吉，主稳步积累、少有横逆；好处不在一夜之间显，而在三五年后回看才明白。',
+         en:'This is an auspicious numeral of steady accumulation rather than sudden windfall. Its value is rarely visible in the moment; it becomes obvious only when looking back over three or five years.' },
+  half:{ zh:'此数半吉，吉处与耗处并存：能成事，但往往要附带付出额外的协调成本。',
+         en:'A mixed numeral: gains and costs arrive together. Things do get done, but usually with an added tax of coordination, patience or compromise.' },
+  bad:{ zh:'此数属凶，主反复与消耗，宜以制度与节奏去对冲，不宜靠一时兴致硬推。',
+        en:'An inauspicious numeral, associated with repetition and attrition. It is better buffered by routine and pacing than pushed through on a burst of enthusiasm.' },
+  worst:{ zh:'此数属大凶，传统上视为波折之数；但五格只是姓名学内部判分，不可据此断定人生。',
+          en:'Classed as highly inauspicious in the traditional table. This remains an internal score within one modern naming school — it is not a verdict on a life.' }
+};
+var GRID_ESSAY = {
+  heaven:{ zh:'天格由姓氏决定，代表先天传承与早年环境，本身不主吉凶，只作为人格的参照。',
+           en:'The Heaven Grid is fixed by the surname. It carries inherited circumstance rather than personal fortune, and is read only as a reference for the Personality Grid.' },
+  person:{ zh:'人格是主运，性格、才能、事业与人际的总枢纽；此数之轻重，决定整张姓名盘的基调。',
+           en:'The Personality Grid is the main luck and the pivot of the whole chart — character, ability, career and relationships all pass through it. Its weight sets the tone of the entire reading.' },
+  earth:{ zh:'地格是前运，管中年以前的活动力、早年处境与亲密关系的质量。',
+          en:'The Earth Grid governs early luck: activity before middle age, the starting environment, and the quality of close relationships.' },
+  outer:{ zh:'外格管社交、外部环境与贵人／小人的比例，也反映亲缘厚薄。',
+          en:'The Outer Grid governs social contact, external circumstances and the balance between helpful and difficult people, as well as the breadth of family ties.' },
+  total:{ zh:'总格是后运，主中年以后整体走向，也常被用来看晚景与下一代的承接。',
+          en:'The Total Grid governs later luck: the overall course after middle age, and traditionally the shape of later years and what is handed on.' }
+};
+var LEVEL_EN = { '大吉':'highly auspicious', '吉':'auspicious', '半吉':'mixed', '凶':'inauspicious', '大凶':'highly inauspicious' };
+
 
 /* 81 numerals, five tiers. Different schools disagree (notably 42 / 49);
    this is one documented five-tier table, not a universal authority. */
@@ -118,7 +162,8 @@ function numeral(n) {
   var tier = 'half';
   Object.keys(TIERS).forEach(function (k) { if (TIERS[k].indexOf(v) !== -1) tier = k; });
   var tail = v % 10;
-  return { value:v, raw:n, tier:tier, wx:WX_BY_TAIL[tail], phase:WX_EN[WX_BY_TAIL[tail]] };
+  return { value:v, raw:n, tier:tier, wx:WX_BY_TAIL[tail], phase:WX_EN[WX_BY_TAIL[tail]],
+           detail:SHULI[String(v)] || null };
 }
 
 /* Five grids, per the documented formulas. */
@@ -129,8 +174,8 @@ function fiveGrids(name, D) {
   if (/[A-Za-z]/.test(s)) return { ok:false, reason:'latin', chars:chars };
   var missing = [];
   var strokes = chars.map(function (ch) {
-    var v = KX[ch];
-    if (v === undefined) { missing.push(ch); return null; }
+    var v = strokeOf(ch);
+    if (v === null || v === undefined) { missing.push(ch); return null; }
     return v;
   });
   if (/[A-Za-z]/.test(s)) return { ok:false, reason:'latin', chars:chars };
@@ -188,12 +233,24 @@ function noNameHTML(lang, reason, g) {
     latin:{ zh:'姓名含拉丁字母。五格剖象以汉字康熙笔画为基础，暂不结论；下方八字命格仍然有效。',
             en:'The name contains Latin letters. Five-Grid numerology requires Chinese characters with Kangxi stroke counts, so no verdict is given; the Bazi structure below still applies.' },
     short:{ zh:'姓名过短，无法区分姓与名；请填写完整汉字姓名。', en:'The name is too short to separate surname and given name. Please enter a full Chinese name.' },
-    missing:{ zh:'笔画表未收录「'+h((g.missing || []).join('、'))+'」。为避免臆测，本站不对未核笔画的字下数理结论；下方八字命格仍然有效。',
-              en:'Stroke data for "'+h((g.missing || []).join(', '))+'" is not in the verified table. Rather than guess, no numerology verdict is given; the Bazi structure below still applies.' }
+    missing:{ zh:'字库（'+DATA_COUNT+' 字）仍未收录「'+h((g.missing || []).join('、'))+'」，多为极生僻字或异体。为避免臆测，本站不对未核笔画的字下数理结论；下方八字命格仍然有效。',
+              en:'The '+DATA_COUNT+'-character dataset has no entry for "'+h((g.missing || []).join(', '))+'" — usually a very rare or variant glyph. Rather than guess, no numerology verdict is given; the Bazi structure below still applies.' }
   };
   return '<div class="nm-placeholder">'+Z(map[reason] || map.empty, lang)+'</div>';
 }
 
+function gridReading(n, key, lang) {
+  var d = n.detail;
+  var title = d ? d.poem : ('数理 ' + n.value);
+  if (lang === 'en') {
+    return '<p class="ng-poem">«'+h(title)+'» <span>'+TIER_EN[n.tier]+'</span></p>' +
+      '<p class="ng-reading">'+h(TIER_ESSAY[n.tier].en)+' '+h(GRID_ESSAY[key].en)+'</p>' +
+      (d && d.keywords ? '<p class="ng-kw">Classical keywords: '+h(d.keywords)+'</p>' : '');
+  }
+  return '<p class="ng-poem">'+h(title)+' <span>'+TIER_ZH[n.tier]+'</span></p>' +
+    '<p class="ng-reading">'+h(d ? d.text : TIER_ESSAY[n.tier].zh)+' '+h(GRID_ESSAY[key].zh)+'</p>' +
+    (d && d.keywords ? '<p class="ng-kw">'+h(d.keywords)+'</p>' : '');
+}
 function gridHTML(g, lang) {
   var rows = GRID_META.map(function (m) {
     var v = g.values[m.k], n = g.numerals[m.k];
@@ -201,9 +258,50 @@ function gridHTML(g, lang) {
       '<span class="ng-tier" style="color:'+TIER_COLOR[n.tier]+'">'+(lang==='en'?TIER_EN[n.tier]:TIER_ZH[n.tier])+'</span></div>' +
       '<div class="ng-num">'+v+'</div>' +
       '<div class="ng-foot"><span>'+(lang==='en'?n.phase:n.wx)+' · '+(lang==='en'?'numeral '+n.value:'数理 '+n.value)+'</span></div>' +
-      '<p class="ng-note">'+h(Z(m.noteZh ? {zh:m.noteZh,en:m.noteEn} : {zh:'',en:''}, lang))+'</p></div>';
+      gridReading(n, m.k, lang) + '</div>';
   }).join('');
-  return '<div class="nm-grids">'+rows+'</div>';
+  return '<div class="nm-grids">'+rows+'</div>'+
+    '<p class="nm-datnote">'+(lang==='en'
+      ? 'Numeral titles and Chinese readings are quoted from a public 81-numeral dataset; English explications are written to the same tier and grid, with proper names kept in the original. Schools disagree on several numbers (notably 42 and 49).'
+      : '数理名称与中文断语引自公开的 81 数理数据集，英文按同一档位与格位另行撰写、专名保留原文。42、49 等数各派判法不一，本站不硬定一尊。')+'</p>';
+}
+
+/* name-character phases vs the chart's favoured phase */
+function wuxingHTML(c, D, g, aff, lang) {
+  if (!g.ok || !aff) return '';
+  var fav = aff.primary;
+  var rows = g.chars.map(function (ch, i) {
+    var w = phaseOf(ch);
+    var rel = 'none';
+    if (w) {
+      if (w === fav) rel = 'same';
+      else if (D.SHENG[w] === fav) rel = 'helps';
+      else if (D.SHENG[fav] === w) rel = 'drains';
+      else if (D.KE[fav] === w) rel = 'checked';
+      else if (D.KE[w] === fav) rel = 'checks';
+    }
+    var label = {
+      same:{zh:'同气扶喜',en:'same phase — supports'},
+      helps:{zh:'生我喜用',en:'generates the favoured phase'},
+      drains:{zh:'喜用所生',en:'fed by the favoured phase'},
+      checked:{zh:'为喜用所克',en:'controlled by the favoured phase'},
+      checks:{zh:'克我喜用',en:'controls the favoured phase'},
+      none:{zh:'字义五行未录',en:'phase not recorded'}
+    }[rel];
+    return '<div class="nw-item"><span class="nw-ch">'+h(ch)+'</span>' +
+      '<span class="nw-phase">'+(w ? h(lang==='en'?WX_EN[w]:w) : '—')+'</span>' +
+      '<span class="nw-stroke">'+(lang==='en'?'Kangxi ':'康熙 ')+g.strokes[i]+'</span>' +
+      '<span class="nw-rel nw-'+rel+'">'+h(Z(label,lang))+'</span></div>';
+  }).join('');
+  var supportive = g.chars.filter(function (ch) {
+    var w = phaseOf(ch);
+    return w && (w === fav || D.SHENG[w] === fav);
+  }).length;
+  var essay = lang==='en'
+    ? 'The chart favours <b>'+WX_EN[fav]+'</b> ('+h(Z(aff.reason,lang))+'). Of the '+g.chars.length+' characters, '+supportive+' carry a phase identical to or generating that favourite. In this school a name is read as a mild supplement to the natal chart: it can echo a needed phase, but it cannot rewrite a Bazi structure. Character phases come from a public 12,487-character dataset based on meaning and radical, which is a different convention from the Five Phases of the stems and branches — read the comparison as a cross-reference, not an equation.'
+    : '本盘喜用 <b>'+h(fav)+'</b>（'+h(Z(aff.reason,lang))+'）。姓名 '+g.chars.length+' 字中，有 '+supportive+' 字的字义五行与喜用同气或直接生扶。按姓名学的看法，名字对命局是「微调」而非「改写」：可以呼应所需之气，改不了月令格局。字义五行取自公开的 12,487 字数据集，依字义与部首归类，与干支五行并非同一套口径，此处作交叉参照，不作等量换算。';
+  return '<div class="nm-wuxing"><h5>'+(lang==='en'?'Name phases × favoured phase':'姓名字义五行 × 八字喜用')+'</h5>' +
+    '<div class="nw-list">'+rows+'</div><p>'+essay+'</p></div>';
 }
 function strokesHTML(g, lang) {
   return '<div class="nm-strokes"><span class="ns-label">'+(lang==='en'?'Kangxi strokes':'康熙笔画')+'</span>' +
@@ -215,16 +313,23 @@ function strokesHTML(g, lang) {
 function talentsHTML(t, lang) {
   var relZh = { same:'同气', generate:'相生', control:'相克', neutral:'平和' };
   var relEn = { same:'same phase', generate:'generating', control:'controlling', neutral:'neutral' };
-  var tagZh = { smooth:'配置流畅', mixed:'喜忧参半', strained:'克制偏多' };
-  var tagEn = { smooth:'A smooth configuration', mixed:'A mixed configuration', strained:'A strained configuration' };
+  var key = t.phases.join('');
+  var info = SANCAI[key] || null;
+  var grade = info ? (LEVEL_EN[info.level] || 'mixed') : (t.grade === 'smooth' ? 'auspicious' : 'strained');
+  var reading = lang==='en'
+    ? (info
+        ? 'The classical 125-combination table classes <b>'+t.phases.map(function(p){return WX_EN[p];}).join('–')+'</b> as <b>'+grade+'</b>. In English: a '+(info.level==='大吉'||info.level==='吉'?'supportive':'demanding')+' configuration means the flow between inherited circumstance, personal drive and early environment is '+(info.level==='大吉'||info.level==='吉'?'mostly unobstructed, so effort compounds':'often interrupted, so pacing and health routines matter more than speed')+'. The original Chinese text is retained below as the source wording.'
+        : 'Heaven → Personality → Earth: generating or identical phases are read as smooth, controlling phases as strained.')
+    : (info
+        ? '三才 <b>'+h(key)+'</b>，传统 125 组合表列为 <b>'+h(info.level)+'</b>：'+h(info.text)+' 此判断只落在姓名学内部，用以观察「先天—主运—前运」之间是否顺行。'
+        : '天 → 人 → 地。同气与相生为顺，相克为滞。');
   return '<div class="nm-talents"><div class="nt-chain">' +
     t.phases.map(function (p, i) {
       return (i ? '<span class="nt-link">'+(lang==='en'?relEn[t.relations[i-1]]:relZh[t.relations[i-1]])+'</span>' : '') +
         '<span class="nt-node">'+h(lang==='en'?WX_EN[p]:p)+'</span>';
-    }).join('') + '</div><span class="nt-grade nt-'+t.grade+'">'+h(lang==='en'?tagEn[t.grade]:tagZh[t.grade])+'</span>'+
-    '<p>'+(lang==='en'
-      ? 'Heaven → Personality → Earth. Generating or identical phases are read as smooth; controlling phases as strained.'
-      : '天 → 人 → 地。同气与相生为顺，相克为滞；三才只作姓名学内部的结构参考。')+'</p></div>';
+    }).join('') + '</div><span class="nt-grade nt-'+t.grade+'">'+h(grade)+'</span>'+
+    '<p class="nt-reading">'+reading+'</p>'+
+    (info && lang==='en' ? '<p class="nt-source">«'+h(info.text)+'»</p>' : '')+'</div>';
 }
 
 function structureHTML(c, D, st, aff, g, lang) {
@@ -243,10 +348,10 @@ function structureHTML(c, D, st, aff, g, lang) {
   var verdict = lang==='en'
     ? 'Read together: the chart takes <b>'+nameEn+'</b> as its structural spine, the Day Master is '+strongWord+', and the favoured phase points '+(aff?'toward '+aff.dir.en:'inward')+'. '+
       (g && g.ok ? 'The name\'s main-luck numeral '+g.numerals.person.value+' ('+TIER_EN[g.numerals.person.tier]+') '+(g.numerals.person.tier==='great'||g.numerals.person.tier==='good'?'echoes that reading':'adds a caution to it')+'. ' : '')+
-      'This is a symbolic synthesis of three different systems, not a factual forecast.'
+      'In practical terms: the month branch sets the kind of pressure you handle best, the Life Palace stars describe how you move under it, the birthplace longitude fixes the hour the chart is built on, and the name numerals add a twentieth-century-derived layer of self-narrative on top. These are systems with different histories. Keep the Bazi structure as the spine, treat direction as a question of pace and environment, and take the name reading as a mirror for habits — not as a forecast.'
     : '合而观之：盘面以 <b>'+nameZh+'</b> 为骨，日主'+strongWord+'，喜用之指向'+(aff?'「'+aff.dir.zh+'」':'未定')+'。'+
       (g && g.ok ? '姓名人格数理 '+g.numerals.person.value+'（'+TIER_ZH[g.numerals.person.tier]+'）'+(g.numerals.person.tier==='great'||g.numerals.person.tier==='good'?'与此同调':'对此另添一层提醒')+'。' : '')+
-      '此为三套体系的象意合参，不是事实预测。';
+      '落到实处说：月令定的是你最能承接哪一类压力，命宫主星说的是你在压力下的动作方式，出生地经度决定这张盘究竟按哪个时辰起，姓名数理则是二十世纪才成形的一层自我叙事。三套体系来历不同，宜以八字格局为骨、以方位为环境节奏之问、以姓名为照见习惯的镜子，不可互相代替，更不是事实预测。';
   return '<div class="nm-structure"><div class="ns2-head"><div><span class="ns2-k">'+(lang==='en'?'CHART STRUCTURE':'命 格')+'</span>' +
     '<h4>'+h(lang==='en'?nameEn:nameZh)+'</h4></div>' +
     (g && g.ok ? '<span class="ns2-badge">'+(lang==='en'?'Main luck ':'人格 ')+g.numerals.person.value+'</span>' : '')+'</div>' +
@@ -258,16 +363,16 @@ function lifeArcHTML(c, D, g, st, lang) {
     ? ['Laying roots · before 20','Building · 20–35','Turning · 35–50','Conserving · 50 onward']
     : ['立根 · 20 岁前','起势 · 20–35','转折 · 35–50','收敛 · 50 岁后'];
   var wordsZh = [
-    '格局之根在此段成形，环境给的框架比个人选择更重；宜把基本功做厚，不必急着定方向。',
-    '主运启动，'+ (st.god || '格局') +'之力开始兑现；适合在一条主线上持续加码，换跑道成本最高。',
-    '总格与主运交接，盘面显示此处最易出现「该收的收、该放的放」；主动整理比被动应付划算。',
-    '节奏转缓，宜守成、宜把经验结构化；往外扩张的收益下降，向内沉淀的收益上升。'
+    '格局之根在此段成形：环境给的框架比个人选择更重，家庭、地域与早年教育先替你划了边界。此段宜把基本功做厚、把可迁移的能力攒下，不必急着定终身方向；地格所主的前运，也多半在此显出活动力的强弱。',
+    '主运启动，'+(st.god || '格局')+'之力开始兑现：日主得令与否、喜用是否透干，会直接反映在事业与收入曲线的斜率上。此段最适合在一条主线上持续加码，换跑道的成本最高；人格数理若吉，贵人常在转折处出现。',
+    '总格与主运交接，是盘面上最容易「该收的收、该放的放」的一段：旧结构已不敷用，新结构尚未成形。主动整理关系、资产与身份，比被动应付事件划算；出生地方位若与喜用相悖，此段也常是重新择城的窗口。',
+    '节奏转缓，宜守成、宜把经验结构化，把「会做」变成「可传」。往外扩张的边际收益下降，向内沉淀与照看身体的收益上升；总格所主的后运，在此显其厚度。'
   ];
   var wordsEn = [
-    'The structure takes root here; environment weighs more than choice. Build fundamentals rather than fixing a direction early.',
-    'Main luck engages and the '+(st.meta?st.meta.en:'chart structure')+' starts to pay out. Compounding on one line beats switching tracks.',
-    'Later luck meets main luck here. Deliberate pruning beats reacting to events — close what is overdue.',
-    'The tempo slows. Consolidation and turning experience into a system outperform outward expansion.'
+    'The structure takes root here: family, region and early schooling draw the boundaries before personal choice does. Build transferable fundamentals rather than fixing a life direction early; the Earth Grid shows how much raw drive is available for this stretch.',
+    'Main luck engages and the '+(st.meta?st.meta.en:'chart structure')+' begins to pay out. Whether the Day Master commands the season, and whether the favoured phase is exposed, show up directly in the slope of career and income. Compounding on one line beats switching tracks; an auspicious Personality numeral tends to bring helpers at exactly the turning points.',
+    'Later luck meets main luck here — the stretch where what is overdue most needs closing. Old structures no longer fit and new ones are not yet built. Deliberate pruning of relationships, assets and roles beats reacting to events; if the birthplace direction runs against the favoured phase, this is also the usual window for choosing a different city.',
+    'The tempo slows. Consolidate, and turn experience into something transmissible — from "I can do it" to "it can be taught". The marginal return on outward expansion falls while the return on inward consolidation and physical care rises; the Total Grid shows its substance here.'
   ];
   var pts = c.pts || [];
   return '<div class="nm-arc">' + labels.map(function (lb, i) {
@@ -281,6 +386,9 @@ function lifeArcHTML(c, D, g, st, lang) {
 
 function sourcesHTML(lang) {
   var items = [
+    ['康熙笔画与字义五行数据集 / Kangxi strokes & character phases','shunshi-kangxi-core@0.1.1 (npm)','https://www.npmjs.com/package/shunshi-kangxi-core'],
+    ['81 数理与 125 三才组合原文 / 81 numerals & 125 Three-Talents texts','shunshi-naming-core@0.1.0 (npm)','https://www.npmjs.com/package/shunshi-naming-core'],
+    ['常用汉字笔画对照 / Common-character stroke reference','kllmctrl/chinese-dictionary','https://github.com/kllmctrl/chinese-dictionary'],
     ['五格剖象法 / Five-Grid numerology','baike.baidu.com/item/总格数理','https://baike.baidu.com/item/%E6%80%BB%E6%A0%BC%E6%95%B0%E7%90%86/1815675'],
     ['计算规则与康熙笔画 / Formulas & Kangxi strokes','ordoslfy.com','https://www.ordoslfy.com/court/847917a3.html'],
     ['81 数理五档表 / 81-numeral tiers','shunshi.ai','https://shunshi.ai/zh-cn/wiki/naming/wuge/shuli_81'],
@@ -311,7 +419,8 @@ function append(body, c, D, lang) {
 
   var inner = '';
   if (g.ok) {
-    inner += strokesHTML(g, lang) + gridHTML(g, lang) + talentsHTML(threeTalents(g, D), lang);
+    inner += strokesHTML(g, lang) + gridHTML(g, lang) + talentsHTML(threeTalents(g, D), lang) +
+             wuxingHTML(c, D, g, aff, lang);
   } else {
     inner += noNameHTML(lang, g.reason, g);
   }

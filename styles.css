@@ -724,3 +724,37 @@ a{color:inherit; text-decoration:none}
 @media (max-width:720px){ .nm-grids{grid-template-columns:repeat(2,1fr)} .nm-sources ul{grid-template-columns:1fr} .ng-num{font-size:32px} }
 @media (prefers-reduced-motion:reduce){ .nm-grid{animation:none !important} }
 @media print{ .nm-sources a{color:#1c1c1c} }
+
+/* --- expanded readings --- */
+.ng-poem{margin:12px 0 6px; font-family:var(--serif); font-size:13px; letter-spacing:.08em; color:var(--gold-lit); line-height:1.6}
+.ng-poem span{font-size:10px; color:var(--muted-2); letter-spacing:.1em; margin-left:6px; white-space:nowrap}
+.ng-reading{margin:0; font-family:var(--serif); font-size:11.5px; line-height:1.95; color:var(--muted)}
+.ng-kw{margin:8px 0 0; font-size:10.5px; letter-spacing:.06em; color:var(--gold-dim); line-height:1.7}
+.nm-datnote{margin:12px 0 26px; font-family:var(--serif); font-size:11.5px; line-height:1.9; color:var(--muted-2)}
+.nt-reading{margin:14px 0 0; font-family:var(--serif); font-size:12.5px; line-height:2; color:var(--muted)}
+.nt-reading b{color:var(--gold-lit); font-weight:500}
+.nt-source{margin:10px 0 0; font-family:var(--serif); font-size:11.5px; line-height:1.9; color:var(--muted-2); border-left:1px solid var(--line); padding-left:12px}
+
+.nm-wuxing{border:1px solid var(--line); background:var(--panel); padding:24px 24px 20px; margin-bottom:28px}
+.nm-wuxing h5{font-size:10.5px; letter-spacing:.26em; color:var(--gold-dim); margin:0 0 18px}
+.nw-list{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:20px}
+.nw-item{display:flex; align-items:center; gap:12px; padding:9px 12px; border:1px solid var(--line-soft); background:var(--bg-2); flex-wrap:wrap}
+.nw-ch{font-family:var(--serif); font-size:19px; color:var(--gold-lit)}
+.nw-phase{font-family:var(--serif); font-size:12.5px; color:var(--ink)}
+.nw-stroke{font-family:var(--display); font-size:11.5px; color:var(--muted-2)}
+.nw-rel{margin-left:auto; font-size:10.5px; letter-spacing:.06em}
+.nw-same,.nw-helps{color:var(--jade)}
+.nw-checks,.nw-checked{color:var(--cinnabar)}
+.nw-drains,.nw-none{color:var(--muted-2)}
+.nm-wuxing > p{margin:0; font-family:var(--serif); font-size:12.5px; line-height:2.05; color:var(--muted)}
+.nm-wuxing > p b{color:var(--gold-lit); font-weight:500}
+
+.reg-intro{margin:0 0 16px; padding-bottom:12px; border-bottom:1px solid var(--line-soft); font-family:var(--serif); font-size:11.5px; line-height:1.95; color:var(--muted-2)}
+.reg-dims p{margin:0 0 6px; font-family:var(--serif); font-size:11.5px; line-height:1.85; color:var(--muted)}
+.reg-dims p:last-child{margin-bottom:0}
+.reg-dims b{color:var(--gold-dim); font-weight:500; font-size:10.5px; letter-spacing:.1em; margin-right:4px}
+.reg-rel{color:var(--muted-2); font-size:10.5px}
+.geo-essay{border-left:1px solid var(--gold-dim); background:rgba(200,168,107,.04); padding:18px 22px; margin-bottom:26px}
+.geo-essay h5{margin:0 0 10px; font-size:10.5px; letter-spacing:.24em; color:var(--gold-dim)}
+.geo-essay p{margin:0; font-family:var(--serif); font-size:12.5px; line-height:2.05; color:var(--muted); letter-spacing:.02em}
+@media (max-width:720px){ .nw-list{grid-template-columns:1fr} .nw-rel{margin-left:0} .nm-wuxing,.geo-essay{padding:18px 16px} }
