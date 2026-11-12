@@ -345,7 +345,207 @@ function Z(x, lang) { return x && (lang === 'en' ? x.en : x.zh) ? (lang === 'en'
 function h(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
   return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
 
-function compassSVG(aff, corr, lang) {
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+/* ------------------------------------------------------------------
+   Concrete birthplace placement. Keywords carry region / phase / bearing;
+   unmatched places fall back to a longitude band. No map, no coordinates
+   beyond the longitude already used for solar-time correction.
+   ------------------------------------------------------------------ */
+var PLACE_MAP = [
+  ['厦门|福州|泉州|莆田|漳州|福建','华东 · 闽南','South-east China (Fujian)','木','东南','South-east',135,'cn'],
+  ['上海|苏|杭州|宁波|南京|浙江|江苏|安徽|合肥|无锡|苏州','华东','East China','木','东','East',90,'cn'],
+  ['北京|天津|河北|石家庄|山西|太原|内蒙古|呼和浩特','华北','North China','水','北','North',0,'cn'],
+  ['广州|深圳|东莞|佛山|珠海|广东|广西|南宁|海南|海口','华南','South China','火','南','South',180,'cn'],
+  ['武汉|长沙|郑州|湖北|湖南|河南|南昌|江西','华中','Central China','土','中','Centre',null,'cn'],
+  ['成都|重庆|四川|贵州|贵阳|云南|昆明|西藏|拉萨|陕西|西安|甘肃|兰州|宁夏|银川|青海|西宁|新疆|乌鲁木齐|喀什','西部','West China','金','西','West',270,'cn'],
+  ['沈阳|大连|长春|哈尔滨|辽宁|吉林|黑龙江','东北','Northeast China','木','东北','North-east',45,'cn'],
+  ['香港|中國香港|中国香港|hong kong','中国香港',"Hong Kong, China",'火','南','South',180,'hmt'],
+  ['澳门|中國澳門|中国澳门|macao','中国澳门','Macao, China','火','南','South',180,'hmt'],
+  ['台湾|台灣|中国台湾|中國台灣|台北|高雄|taiwan|taipei','中国台湾','Taiwan, China','木','东南','South-east',135,'hmt'],
+  ['东京|tokyo|首尔|seoul|大阪|京都','东亚','East Asia','木','东','East',90,'out'],
+  ['新加坡|曼谷|吉隆坡|越南|泰国|马来西亚|印尼|菲律宾|singapore|bangkok','东南亚','South-East Asia','火','南','South',180,'out'],
+  ['伦敦|巴黎|柏林|法兰克福|阿姆斯特丹|london|paris|berlin','欧洲','Europe','金','西','West',270,'out'],
+  ['纽约|洛杉矶|旧金山|温哥华|多伦多|芝加哥|new york|los angeles|san francisco|vancouver|toronto','北美','North America','金','西','West',270,'out'],
+  ['悉尼|墨尔本|奥克兰|sydney|melbourne|auckland','澳新','Australasia','水','北','North',0,'out']
+];
+function locatePlace(place, lon) {
+  var s = String(place || '').trim();
+  if (s) {
+    for (var i = 0; i < PLACE_MAP.length; i++) {
+      var row = PLACE_MAP[i], keys = row[0].split('|');
+      for (var j = 0; j < keys.length; j++) {
+        if (s.toLowerCase().indexOf(keys[j].toLowerCase()) !== -1) {
+          return { name:s, matched:keys[j], rz:row[1], re:row[2], wx:row[3],
+                   dz:row[4], de:row[5], deg:row[6], g:row[7], lon:lon };
+        }
+      }
+    }
+  }
+  if (lon == null || lon === undefined) {
+    return { name:s || '', matched:'', rz:'未定位', re:'Not located', wx:'土',
+             dz:'中', de:'Centre', deg:null, g:'cn', lon:null };
+  }
+  var band = lon < 100 ? ['西部','West China','金','西','West',270]
+           : lon < 112 ? ['中西部','Central-West China','土','西南','South-west',225]
+           : lon < 122 ? ['中东部','Central-East China','木','东南','South-east',135]
+                       : ['东部沿海','Eastern Seaboard','木','东','East',90];
+  return { name:s || '', matched:'经度带 ' + lon.toFixed(2) + '°E', rz:band[0], re:band[1],
+           wx:band[2], dz:band[3], de:band[4], deg:band[5], g:'cn', lon:lon };
+}
+function hhmm(m) {
+  var q = ((m % 1440) + 1440) % 1440;
+  return String(Math.floor(q / 60)).padStart(2, '0') + ':' + String(q % 60).padStart(2, '0');
+}
+function relLabel(a, b, D, lang) {
+  if (a === b) return lang==='en' ? 'same phase (同气)' : '同气';
+  if (D.SHENG[a] === b) return lang==='en' ? 'a generates b (相生)' : '相生（我生彼）';
+  if (D.SHENG[b] === a) return lang==='en' ? 'b generates a (受生)' : '受生（彼生我）';
+  if (D.KE[a] === b) return lang==='en' ? 'a controls b (相克)' : '相克（我克彼）';
+  if (D.KE[b] === a) return lang==='en' ? 'b controls a (受克)' : '受克（彼克我）';
+  return lang==='en' ? 'neutral' : '平和';
+}
+function placeNumbers(c, D, aff, loc) {
+  var dm = D.GAN_WX[c.dayGan], fav = aff.primary, lp = loc.wx;
+  var favDeg = aff.dir.deg == null ? null : aff.dir.deg;
+  var gap = (favDeg == null || loc.deg == null) ? null : Math.abs(favDeg - loc.deg);
+  if (gap !== null && gap > 180) gap = 360 - gap;
+  var same = lp === fav, gen = D.SHENG[lp] === fav, ctrl = D.KE[lp] === fav || D.KE[fav] === lp;
+  var stay = Math.round(clamp(52 + (same?20:gen?11:ctrl?-13:0) + (gap===null?0:8-gap/22), 22, 92));
+  var move = Math.round(clamp(55 + (same?9:gen?18:ctrl?-4:6) + (gap===null?0:gap/14), 24, 94));
+  var back = Math.round(clamp(46 - (same?12:0) + (gap===null?0:gap/24), 18, 78));
+  return { dm:dm, fav:fav, lp:lp, gap:gap, stay:stay, move:move, back:back,
+           same:same, gen:gen, ctrl:ctrl, favDeg:favDeg };
+}
+function starText(arr, lang) {
+  if (!arr || !arr.length) return lang==='en' ? 'empty palace' : '空宫';
+  return arr.slice(0,2).map(function (s) {
+    return lang==='en' && window.GXJI18N ? (window.GXJI18N.TERMS.star[s] || s) : s;
+  }).join(' · ');
+}
+
+/* --- 1. the numeric chain from birthplace to the chart --- */
+function chainHTML(c, D, loc, corr, aff, lang) {
+  var ZHI = D.ZHI, GAN = D.GAN;
+  var bn = function (z) { return lang==='en' && window.GXJI18N ? window.GXJI18N.TERMS.branch[z] : ZHI[z]; };
+  var gn = function (g) { return lang==='en' && window.GXJI18N ? window.GXJI18N.TERMS.stem[g] : GAN[g]; };
+  var clockT = corr.clockT == null ? c.clockT : corr.clockT;
+  var corrected = gn((C_ziGan(c, D) + corr.t) % 10) + bn(corr.t);
+  var naive = c.naive || null;
+  var naiveText = naive ? (gn(naive.hourGan) + bn(naive.t)) : '—';
+  var alt = c.alt || null;
+  var altText = alt ? (gn(alt.hourGan) + bn(alt.t)) : '—';
+  var changed = naive && (naive.t !== corr.t);
+  var steps = [];
+  steps.push([lang==='en' ? 'You entered' : '你填的是',
+    (loc.name || (lang==='en'?'not entered':'未填')) + (loc.lon!=null ? ' · ' + loc.lon.toFixed(2) + '°E' : '') +
+    (loc.matched ? ' · ' + (lang==='en'?'matched: ':'归类：') + loc.matched : '')]);
+  steps.push([lang==='en' ? 'Longitude offset' : '经度时差',
+    corr.applied
+      ? ((lang==='en'?'central meridian ':'中央经线 ') + Number(corr.ref).toFixed(0) + '°E · (' + loc.lon.toFixed(2) + '−' + Number(corr.ref).toFixed(0) + ') × 4 = ' +
+         (corr.delta>=0?'+':'') + corr.delta.toFixed(1) + ' min' + (lang==='en'?' · equation of time ':' · 均时差 ') + (corr.eq>=0?'+':'') + corr.eq.toFixed(1) + ' min')
+      : (lang==='en' ? 'No recognised place — no correction applied.' : '未识别到出生地，未做校正。')]);
+  steps.push([lang==='en' ? 'Clock → apparent solar time' : '钟表时 → 真太阳时',
+    hhmm(corr.clock) + ' → ' + hhmm(corr.solar) + (corr.exact ? '' : (lang==='en'?' (hour mid-point)':'（时辰中点）')) +
+    ' · ' + (lang==='en'?'hour ':'时辰 ') + (lang==='en'? '': ZHI[clockT] + ' → ') + bn(corr.t) +
+    ' · ' + (lang==='en' ? c.toBoundary + ' min to the next hour boundary' : '距下一时辰边界还有 ' + c.toBoundary + ' 分钟')]);
+  steps.push([lang==='en' ? 'Hour Pillar' : '时柱',
+    (lang==='en'?'corrected ':'校正后 ') + '<b>' + h(corrected) + '</b>' +
+    (lang==='en'?' · clock-only would give ':' · 只按钟表则为 ') + '<b>' + h(naiveText) + '</b>' +
+    (changed ? (lang==='en'?' — <b>the pillar changes</b>':' — <b>时柱已改变</b>') : (lang==='en'?' — unchanged':' — 本次未换柱'))]);
+  steps.push([lang==='en' ? 'Life Palace & stars' : '命宫与主星',
+    (lang==='en'?'corrected ':'校正后 ') + '<b>' + bn(c.mingZhi) + '</b> · ' + h(starText(c.mingStars, lang)) +
+    (naive ? (lang==='en'?' · clock-only ':' · 不校正则 ') + bn(naive.mingZhi) + ' · ' + h(starText(naive.stars, lang)) : '')]);
+  steps.push([lang==='en' ? 'If born just across the boundary' : '若生在交界另一侧',
+    '<b>' + h(altText) + '</b>' + (lang==='en'?' → Life Palace ':' → 命宫 ') + (alt?bn(alt.mingZhi):'—') +
+    ' · ' + h(starText(alt ? alt.stars : [], lang)) +
+    (lang==='en'
+      ? '. This is why the birthplace field is not decoration: eight minutes moved the whole star layout for people born near 11:00 or 23:00.'
+      : '。这就是出生地不是装饰字段的原因：生在 11:00 / 23:00 交界的人，几分钟之差会换掉整张星盘。')]);
+  var title = lang==='en' ? 'Birthplace → your chart, step by step' : '出生地 → 你的命盘：逐步可复算';
+  return '<div class="chain"><h5>' + title + '</h5>' + steps.map(function (s, i) {
+    return '<div class="chain-step"><span class="cs-n">' + String(i+1).padStart(2,'0') + '</span>' +
+      '<div class="cs-body"><span class="cs-k">' + h(s[0]) + '</span><span class="cs-val">' + s[1] + '</span></div></div>';
+  }).join('') + '</div>';
+}
+function C_ziGan(c, D) {
+  /* recompute the Zi-hour stem from the day stem (Five Rats) */
+  return (c.dayGan % 5) * 2;
+}
+
+/* --- 2. birthplace phase × Day Master × favoured phase, with numbers --- */
+function placeVerdictHTML(c, D, aff, loc, corr, lang) {
+  var n = placeNumbers(c, D, aff, loc);
+  var dmWx = n.dm, fav = n.fav, lp = n.lp;
+  var wxs = c.wxPct || {};
+  var head = lang==='en'
+    ? 'Your birthplace is <b>'+h(loc.re||loc.rz)+'</b> ('+h(loc.de)+ (loc.deg!=null?' '+loc.deg+'°':'') +'), classed <b>'+PHASE_EN[lp]+'</b>. Day Master is <b>'+D.GAN[c.dayGan]+' ('+PHASE_EN[dmWx]+')</b>; the chart favours <b>'+PHASE_EN[fav]+'</b> ('+h(aff.dir.en)+ (n.favDeg!=null?' '+n.favDeg+'°':'') +').'
+    : '出生地 <b>'+h(loc.rz)+'</b>（'+h(loc.dz)+(loc.deg!=null?' '+loc.deg+'°':'')+'），五行属 <b>'+h(lp)+'</b>；日主 <b>'+D.GAN[c.dayGan]+h(dmWx)+'</b>，盘面喜用 <b>'+h(fav)+'</b>（'+h(aff.dir.zh)+(n.favDeg!=null?' '+n.favDeg+'°':'')+'）。';
+  var rel1 = relLabel(lp, dmWx, D, lang), rel2 = relLabel(lp, fav, D, lang);
+  var pctDm = wxs[dmWx] != null ? wxs[dmWx] : '—';
+  var pctFav = wxs[fav] != null ? wxs[fav] : '—';
+  var body = lang==='en'
+    ? 'Local phase '+PHASE_EN[lp]+' vs your Day Master '+PHASE_EN[dmWx]+': <b>'+h(rel1)+'</b>. Your chart already carries '+pctDm+'% '+PHASE_EN[dmWx]+' and '+pctFav+'% '+PHASE_EN[fav]+'; against the favoured phase the local phase is <b>'+h(rel2)+'</b>. '+
+      (n.same ? 'That means the place you started from reinforces the phase you need — early grounding is real, but staying also keeps adding the same input rather than opening an outlet.' :
+       n.gen ? 'The local phase generates your favoured phase, so the starting environment quietly feeds the thing the chart needs; the risk is taking that support for granted.' :
+       n.ctrl ? 'The local phase works against the favoured phase, which reads as friction in daily routine rather than bad luck.' :
+                'The local phase is neutral to the favoured phase; place is neither helping nor blocking the core structure.')+
+      (n.gap!=null ? ' The compass gap between home ('+loc.deg+'°) and the favoured direction ('+n.favDeg+'°) is <b>'+n.gap+'°</b> — '+(n.gap<=45?'adjacent, a short move in symbolic terms':n.gap<=135?'a quarter-to-half turn, a real change of setting':'nearly opposite, the largest adjustment')+'.' : '')
+    : '本地'+h(lp)+'与日主'+h(dmWx)+'：<b>'+h(rel1)+'</b>。你的盘里'+h(dmWx)+'已占 '+pctDm+'%、喜用'+h(fav)+'占 '+pctFav+'%；本地五行对喜用是 <b>'+h(rel2)+'</b>。'+
+      (n.same ? '也就是说，你起步的地方正好补着你需要的那股气——早年得地是真的，但继续留着，是继续加同一种输入，而不是替它开一个出口。' :
+       n.gen ? '本地之气生喜用，起点的环境在不动声色地供着盘面所需；要留意的是把这份托底当成理所当然。' :
+       n.ctrl ? '本地之气与喜用相制，读作日常节奏上的摩擦，不是「运气差」。' :
+                '本地与喜用不冲不扶，方位既不帮忙也不挡路，核心结构仍由八字本身决定。')+
+      (n.gap!=null ? ' 罗盘上本地方位 '+loc.deg+'° 与喜用方位 '+n.favDeg+'° 相差 <b>'+n.gap+'°</b> —— '+(n.gap<=45?'相邻位，象意上是一次短距离移动':n.gap<=135?'四分之一到半圈，属于真正换环境':'近乎对冲，是最大的一次调整')+'。' : '');
+  var metrics = [
+    { k:lang==='en'?'Stay near birthplace':'留在本地', v:n.stay, d:lang==='en'?'same-phase grounding, limited outlet':'同气托底，但出口有限' },
+    { k:lang==='en'?'Move toward favoured direction':'往喜用方位', v:n.move, d:lang==='en'?'opens the generating / draining path':'引出相生或泄秀的路径' },
+    { k:lang==='en'?'Move opposite':'反向而行', v:n.back, d:lang==='en'?'highest rebuilding cost':'重建成本最高' }
+  ].map(function (m) {
+    return '<div class="pv-metric"><div class="pm-top"><span>'+h(m.k)+'</span><b>'+m.v+'</b></div>' +
+      '<div class="pm-bar"><span style="width:'+m.v+'%"></span></div><p>'+h(m.d)+'</p></div>';
+  }).join('');
+  var note = lang==='en'
+    ? 'Scores come from the phase relation (same +20 / generating +11 / controlling −13), the bearing gap and the chart\'s balance index '+Math.round(c.balance*100)+'/100. They rank environmental friction, not fortune.'
+    : '分数由五行关系（同气 +20 / 相生 +11 / 相制 −13）、方位夹角与盘面均衡度 '+Math.round(c.balance*100)+'/100 合成，排的是环境摩擦，不是吉凶。';
+  return '<div class="place-verdict"><h5>'+(lang==='en'?'Your birthplace × your chart':'出生地 × 你的命格')+'</h5>' +
+    '<p class="pv-head">'+head+'</p><p class="pv-body">'+body+'</p>' +
+    '<div class="pv-metrics">'+metrics+'</div><p class="pv-note">'+note+'</p></div>';
+}
+
+/* --- 3. four life phases tied to this person, this place, this direction --- */
+function futurePlaceHTML(c, D, aff, loc, lang) {
+  var n = placeNumbers(c, D, aff, loc);
+  var dm = D.GAN[c.dayGan] + D.GAN_WX[c.dayGan];
+  var st = c.pillars[1].god || '';
+  var stars = starText(c.mingStars, lang);
+  var pts = c.pts || [];
+  var segAvg = function (i) {
+    var a = pts.slice(i*2, i*2+3);
+    return a.length ? Math.round(a.reduce(function (s,p){return s+p.v;},0)/a.length) : 55;
+  };
+  var zh = [
+    '以 '+ (loc.name||'你的出生地') +' 起盘，本地'+loc.wx+'与日主'+D.GAN_WX[c.dayGan]+'为'+relLabel(loc.wx, D.GAN_WX[c.dayGan], D, 'zh')+'。这落到你身上就是：早年的秩序感由环境给足，不必自己挣，所以习惯先观察再动。此段节律 '+segAvg(0)+'/100，'+(n.same?'同气太足反而少了推力，宜把可迁移的本事攒下，别急着离乡':'本地不供这股气，宜向外找补，但不必急着搬')+'。命宫'+stars+'，也偏向先在既有结构里长本事。',
+    '月柱十神「'+st+'」、日主'+dm+'，这一段要的是'+ (n.gen?'把本地的相生之气变成作品与收入':'一个能把'+aff.primary+'之气引出来的出口') +'。喜用方位 '+ (n.favDeg!=null?n.favDeg+'°':'中央') +'，与本地差 '+(n.gap!=null?n.gap+'°':'—')+'；若 '+n.move+' > '+n.stay+'（本例正是如此），含义很具体：这十年换环境的收益高于只换工作，因为换环境同时改了方位、行业与人际密度。节律 '+segAvg(1)+'/100，宜在一条主线上加码，不宜三条并行。',
+    '到这里，'+(c.strengthWord==='偏旺'?'日主偏旺':'日主'+c.strengthWord)+'、'+aff.primary+'气 '+ (c.wxPct[aff.primary]!=null?c.wxPct[aff.primary]+'%':'—') +'，命宫'+stars+'的结构开始显出上限：旧环境能给的都给过了。盘面这一段最值得做的，是把前面攒的东西换一个承载它的地方——'+(n.gap!=null&&n.gap<=45?'夹角只有 '+n.gap+'°，不必跨大区，往相邻的火／土位就够':'夹角 '+n.gap+'°，需要一次真正的跨区移动')+'。节律 '+segAvg(2)+'/100，主动整理胜过被动应付。',
+    '末段节律 '+segAvg(3)+'/100，留 '+n.stay+' / 往 '+n.move+' / 反 '+n.back+' 的差距在这里收敛：方位不再决定增量，决定的是你把经验交给谁。若前一段已经往喜用方位动过，此处宜守成、把「会做」变成「可传」；若一直留在本地，也无需补一次迁移，真正要补的是'+aff.primary+'气对应的作息与输出习惯。'
+  ];
+  var en = [
+    'Charted from '+(loc.name||'your birthplace')+': local '+PHASE_EN[loc.wx]+' vs Day Master '+PHASE_EN[D.GAN_WX[c.dayGan]]+' is '+relLabel(loc.wx, D.GAN_WX[c.dayGan], D, 'en')+'. For you that means early order was supplied by the environment rather than earned — hence the instinct to observe before moving. Rhythm here is '+segAvg(0)+'/100; '+(n.same?'same-phase grounding is real but adds no thrust, so bank transferable skills rather than leaving early':'the place does not supply that phase, so look outward for it without relocating yet')+'. Life Palace '+h(stars)+' also favours growing competence inside an existing structure.',
+    'Month-pillar relationship "'+h((window.GXJI18N && window.GXJI18N.TERMS.god[st]) || st)+'" with Day Master '+D.GAN[c.dayGan]+' ('+PHASE_EN[D.GAN_WX[c.dayGan]]+') wants '+(n.gen?'the local generating phase turned into output and income':'an outlet that draws out '+PHASE_EN[aff.primary])+'. The favoured bearing is '+(n.favDeg!=null?n.favDeg+'°':'centre')+', '+ (n.gap!=null?n.gap+'°':'—') +' from home. When the move score ('+n.move+') exceeds the stay score ('+n.stay+'), the concrete reading is: changing environment pays more than changing job, because it alters bearing, industry and network density at once. Rhythm '+segAvg(1)+'/100 — compound on one line, not three.',
+    'By now a '+(c.strength>=63?'strong':c.strength<=40?'weak':'balanced')+' Day Master with '+ (c.wxPct[aff.primary]!=null?c.wxPct[aff.primary]+'%':'—') +' '+PHASE_EN[aff.primary]+' and a Life Palace of '+h(stars)+' shows its ceiling: the starting environment has given what it can. The useful move is to put accumulated work somewhere that can carry it — '+(n.gap!=null&&n.gap<=45?'only '+n.gap+'° apart, so an adjacent Fire/Earth region suffices, not a cross-continent leap':'a '+n.gap+'° gap, so a genuine cross-region move')+'. Rhythm '+segAvg(2)+'/100; deliberate pruning beats reacting.',
+    'Final rhythm '+segAvg(3)+'/100. The stay '+n.stay+' / move '+n.move+' / opposite '+n.back+' spread narrows here: direction stops adding increment, and what matters is who receives the experience. If you already moved toward the favoured bearing, consolidate and make skill teachable; if you stayed, a late relocation is not owed — what is owed is the daily routine and output habit that '+PHASE_EN[aff.primary]+' stands for.'
+  ];
+  var labels = lang==='en'
+    ? ['Before 20 · where you started','20–35 · where the structure pays','35–50 · where the ceiling appears','50 onward · what you hand on']
+    : ['20 岁前 · 起点给了什么','20–35 · 格局在哪里兑现','35–50 · 上限在哪里出现','50 岁后 · 交给谁'];
+  return '<div class="future-place"><h5>'+(lang==='en'?'Your future, tied to your birthplace and chart':'未来走向 × 出生地 × 你的命格')+'</h5>' +
+    labels.map(function (lb, i) {
+      return '<div class="fp-item"><span class="fp-age">'+h(lb)+'</span><p>'+h(lang==='en'?en[i]:zh[i])+'</p></div>';
+    }).join('') + '</div>';
+}
+
+function compassSVG(aff, corr, lang, loc) {
   var deg = aff.dir.deg == null ? 90 : aff.dir.deg;
   var marks = lang === 'en'
     ? [['N','0'],['NE','45'],['E','90'],['SE','135'],['S','180'],['SW','225'],['W','270'],['NW','315']]
@@ -376,6 +576,12 @@ function compassSVG(aff, corr, lang) {
     var x = 160 + 96 * Math.sin(rad), y = 160 - 96 * Math.cos(rad);
     parts.push('<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+cols[p[0]]+'" opacity="'+(p[0]===aff.primary?'1':'.45')+'"/>');
   });
+  /* dashed pointer toward the birthplace bearing */
+  if (loc && loc.deg != null) {
+    parts.push('<g class="compass-local" transform="rotate(' + loc.deg + ' 160 160)">' +
+      '<line x1="160" y1="160" x2="160" y2="70" stroke="#83a99f" stroke-width="1.3" stroke-dasharray="4 4" opacity=".85"/>' +
+      '<circle cx="160" cy="70" r="3.4" fill="#83a99f"/></g>');
+  }
   /* pointer toward the favoured direction */
   parts.push('<g class="compass-needle" transform="rotate(' + deg + ' 160 160)">' +
     '<line x1="160" y1="160" x2="160" y2="52" stroke="#e8d4a4" stroke-width="1.6"/>' +
@@ -491,11 +697,12 @@ function append(body, c, D, lang) {
   var anchor = body.querySelector('.read-actions');
   if (!anchor || body.querySelector('#geo-module')) return;
 
-  var titleA = lang==='en' ? 'Place & Direction' : '出 生 地 · 发 展 方 位';
+  var loc = locatePlace(c.input && c.input.place, corr.lon);
+  var titleA = lang==='en' ? 'Birthplace × Your Chart' : '出 生 地 × 你 的 命 盘';
   var titleB = lang==='en' ? 'Calibration Q&A' : '问 答 校 准';
   var lead = lang==='en'
-    ? 'Birthplace now participates in the calculation: longitude drives an apparent-solar-time correction, and the Day Master\'s favoured phase sets a symbolic direction. This is a Five-Phase compass, not a geographic map.'
-    : '出生地现已参与推算：经度用于真太阳时校正，日主喜用五行定出象意方位。下图为五行方位罗盘，不是地理地图。';
+    ? 'Every figure below is computed from what you entered: your place, your clock time, your four pillars. Gold needle = favoured phase direction; dashed green = your birthplace bearing. This is a symbolic compass, not a map.'
+    : '下面每个数字都由你填的内容算出：出生地、出生时刻、四柱。金色指针为喜用方位，绿色虚线为出生地方位；这是象意罗盘，不是地理地图。';
   var regionLead = lang==='en'
     ? 'Regional fit is a symbolic Five-Phase comparison, not migration, employment or investment advice. Hong Kong, Macao and Taiwan are listed as regions of China.'
     : '区域适配为五行象意比对，不是移民、就业或投资建议。中国香港、中国澳门、中国台湾均为中国的地区，单列一组。';
@@ -504,16 +711,21 @@ function append(body, c, D, lang) {
   '<div class="read-section geo-sec" id="geo-module">' +
     '<div class="read-section-head"><span class="rs-no">X</span><h3 class="rs-title">'+titleA+'</h3><span class="rs-en">PLACE &amp; DIRECTION</span></div>' +
     '<p class="geo-lead">'+lead+'</p>' +
-    directionEssay(c, aff, lang) + solarEssay(c, corr, lang) +
-    '<div class="geo-layout"><div class="geo-compass">' + compassSVG(aff, corr, lang) +
+    chainHTML(c, D, loc, corr, aff, lang) + placeVerdictHTML(c, D, aff, loc, corr, lang) +
+    solarEssay(c, corr, lang) +
+    '<div class="geo-layout"><div class="geo-compass">' + compassSVG(aff, corr, lang, loc) +
       '<div class="compass-cap">'+(lang==='en'
         ? 'Favoured phase <b>'+PHASE_EN[aff.primary]+'</b> · direction <b>'+aff.dir.en+'</b>'
         : '喜用 <b>'+aff.primary+'</b> · 方位 <b>'+aff.dir.zh+'</b>')+'</div>' +
-      '<p class="aff-reason">'+h(Z(aff.reason,lang))+'</p>' +
+      '<p class="aff-reason">'+h(Z(aff.reason,lang))+' '+
+      (lang==='en'
+        ? 'Birthplace bearing '+(loc.deg!=null?loc.deg+'°':'—')+' ('+h(loc.de)+') vs favoured '+(aff.dir.deg!=null?aff.dir.deg+'°':'centre')+'.'
+        : '出生地方位 '+(loc.deg!=null?loc.deg+'°':'—')+'（'+h(loc.dz)+'）对照喜用 '+(aff.dir.deg!=null?aff.dir.deg+'°':'中')+'。')+'</p>' +
     '</div>' + solarCard(c, corr, lang) + '</div>' +
     '<h4 class="reg-title">'+(lang==='en'?'Regional fit · three dimensions':'区域适配 · 三维展开')+'</h4>' +
     '<p class="geo-lead">'+regionLead+'</p>' +
     '<div class="reg-grid" id="reg-grid">'+regionHTML(c, aff, D, null, lang)+'</div>' +
+    futurePlaceHTML(c, D, aff, loc, lang) +
   '</div>' +
   '<div class="read-section geo-sec" id="qa-module">' +
     '<div class="read-section-head"><span class="rs-no">XI</span><h3 class="rs-title">'+titleB+'</h3><span class="rs-en">SIX QUESTIONS</span></div>' +

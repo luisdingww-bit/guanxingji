@@ -317,6 +317,28 @@ function buildChart(input) {
   const palaceName = {};
   PALACE_NAMES.forEach(function (nm, k) { palaceName[((mingZhi - k) % 12 + 12) % 12] = nm; });
 
+  /* --- counterfactual chart: what a clock-only reading would produce --- */
+  const naiveMingZhi = C.mingZhiOf(lunar.month, t0);
+  const naive = {
+    t: t0,
+    hourGan: (C.ziGanOf(dayGan) + t0) % 10,
+    mingZhi: naiveMingZhi,
+    stars: starsByZhi[naiveMingZhi],
+    shenZhi: C.shenZhiOf(lunar.month, t0)
+  };
+  const altT = (t + 11) % 12;                 /* adjacent earlier double-hour */
+  const altMingZhi = C.mingZhiOf(lunar.month, altT);
+  const alt = {
+    t: altT,
+    hourGan: (C.ziGanOf(dayGan) + altT) % 10,
+    mingZhi: altMingZhi,
+    stars: starsByZhi[altMingZhi]
+  };
+  const startMin = (((corr.t * 120 - 60) % 1440) + 1440) % 1440;
+  const solarMod = (((corr.solar % 1440) + 1440) % 1440);
+  const within = (((solarMod - startMin) % 1440) + 1440) % 1440;
+  const toBoundary = Math.max(0, Math.round(120 - within));
+
   /* --- Tarot: deterministic three-card spread --- */
   const lifeCard = ((y + m + d - 1) % 22 + 22) % 22;
   const used = {}; const cards = [];
@@ -369,6 +391,7 @@ function buildChart(input) {
     mingZhi:mingZhi, shenZhi:shenZhi, mingGan:mingGan, mingNayin:mingNayin,
     ju:ju, juName:juName, palaceGan:palaceGan, palaceName:palaceName,
     starsByZhi:starsByZhi, mingStars:mingStars, oppStars:oppStars, borrowed:borrowed,
+    naive:naive, alt:alt, toBoundary:toBoundary,
     ziweiZhi:ziweiZhi, tianfuZhi:tianfuZhi,
     cards:cards, lifeCard:lifeCard, pts:pts, stages:stages, peakAge:peakAge,
     flowWord:flowWord, seed:seed, r:r
