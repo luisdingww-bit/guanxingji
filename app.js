@@ -700,6 +700,7 @@ function renderReading(c) {
   if (lang === 'en' && window.GXJEn) {
     window.GXJEn.render(body, c, D);
     if (window.GXJGeo) window.GXJGeo.append(body, c, D, lang);
+    if (window.GXJName) window.GXJName.append(body, c, D, lang);
     return;
   }
 
@@ -747,8 +748,9 @@ function renderReading(c) {
     setTimeout(function () { window.print(); }, 80);
   });
 
-  /* place / direction / calibration modules (bilingual inside geo.js) */
+  /* place / direction / calibration / name modules (bilingual inside each) */
   if (window.GXJGeo) window.GXJGeo.append(body, c, D, lang);
+  if (window.GXJName) window.GXJName.append(body, c, D, lang);
 }
 function fallbackCopy(text, done) {
   const ta = document.createElement('textarea');
