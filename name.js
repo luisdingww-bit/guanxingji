@@ -188,8 +188,8 @@ function noNameHTML(lang, reason, g) {
     latin:{ zh:'姓名含拉丁字母。五格剖象以汉字康熙笔画为基础，暂不结论；下方八字命格仍然有效。',
             en:'The name contains Latin letters. Five-Grid numerology requires Chinese characters with Kangxi stroke counts, so no verdict is given; the Bazi structure below still applies.' },
     short:{ zh:'姓名过短，无法区分姓与名；请填写完整汉字姓名。', en:'The name is too short to separate surname and given name. Please enter a full Chinese name.' },
-    missing:{ zh:'笔画表未收录「'+h(g.missing.join('、'))+'」。为避免臆测，本站不对未核笔画的字下数理结论；下方八字命格仍然有效。',
-              en:'Stroke data for "'+h(g.missing.join(', '))+'" is not in the verified table. Rather than guess, no numerology verdict is given; the Bazi structure below still applies.' }
+    missing:{ zh:'笔画表未收录「'+h((g.missing || []).join('、'))+'」。为避免臆测，本站不对未核笔画的字下数理结论；下方八字命格仍然有效。',
+              en:'Stroke data for "'+h((g.missing || []).join(', '))+'" is not in the verified table. Rather than guess, no numerology verdict is given; the Bazi structure below still applies.' }
   };
   return '<div class="nm-placeholder">'+Z(map[reason] || map.empty, lang)+'</div>';
 }
